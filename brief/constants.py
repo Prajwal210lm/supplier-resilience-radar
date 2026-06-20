@@ -1,0 +1,2 @@
+SYNTHESIS_MODEL = "claude-sonnet-4-6"
+SYNTHESIS_MAX_TOKENS = 4096

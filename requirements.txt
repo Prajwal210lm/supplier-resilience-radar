@@ -1,3 +1,7 @@
 numpy
 sentence-transformers
+langgraph
+fastapi
+uvicorn
+httpx
 pytest
