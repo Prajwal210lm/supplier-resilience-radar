@@ -11,20 +11,12 @@ from profile_core.builder import build_profile
 from profile_core.loader import load_suppliers
 
 app = FastAPI()
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
-                   allow_headers=["*"])
+
+_origins = os.environ.get("FRONTEND_ORIGIN", "*").split(",")
+app.add_middleware(CORSMiddleware, allow_origins=_origins,
+                   allow_methods=["*"], allow_headers=["*"])
 
 CACHE_DIR = "data/cache"
-
-
-# Build the store once at startup and keep it on app.state.
-@app.on_event("startup")
-def _startup():
-    from anthropic import Anthropic
-    from rag.chunker import parse_contracts
-    from rag.store import ContractStore
-    app.state.store = ContractStore(parse_contracts())
-    app.state.client = Anthropic()
 
 
 def _claim_to_dict(c):
@@ -98,9 +90,7 @@ def risk_brief(supplier_id: str, fresh: bool = False):
         resp["meta"]["cached"] = True
         return resp
     try:
-        state = run_assessment(supplier_id,
-                               client=getattr(app.state, "client", None),
-                               store=getattr(app.state, "store", None))
+        state = run_assessment(supplier_id)
     except KeyError:
         raise HTTPException(status_code=404, detail=f"unknown supplier {supplier_id}")
     resp = state_to_response(state, cached=False)

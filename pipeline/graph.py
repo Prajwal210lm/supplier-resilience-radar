@@ -59,13 +59,31 @@ def build_graph(client, store):
     return g.compile()
 
 
-def run_assessment(supplier_id, client=None, store=None):
-    if client is None:
-        from anthropic import Anthropic
-        client = Anthropic()
-    if store is None:
+_STORE = None
+_CLIENT = None
+
+
+def _default_store():
+    global _STORE
+    if _STORE is None:
         from rag.chunker import parse_contracts
         from rag.store import ContractStore
-        store = ContractStore(parse_contracts())
+        _STORE = ContractStore(parse_contracts())
+    return _STORE
+
+
+def _default_client():
+    global _CLIENT
+    if _CLIENT is None:
+        from anthropic import Anthropic
+        _CLIENT = Anthropic()
+    return _CLIENT
+
+
+def run_assessment(supplier_id, client=None, store=None):
+    if client is None:
+        client = _default_client()
+    if store is None:
+        store = _default_store()
     graph = build_graph(client, store)
     return graph.invoke({"supplier_id": supplier_id})
