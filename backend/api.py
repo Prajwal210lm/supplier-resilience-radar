@@ -12,9 +12,16 @@ from profile_core.loader import load_suppliers
 
 app = FastAPI()
 
-_origins = os.environ.get("FRONTEND_ORIGIN", "*").split(",")
-app.add_middleware(CORSMiddleware, allow_origins=_origins,
-                   allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://supplier-resilience-radar.vercel.app",
+        "http://localhost:3000",
+        "http://localhost:3001",
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 CACHE_DIR = "data/cache"
 
