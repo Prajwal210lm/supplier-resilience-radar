@@ -1,0 +1,25 @@
+{
+  "supplier_id": "SUP-011",
+  "supplier_name": "Bosch Sensortec",
+  "profile": {
+    "spend_share": 0.015,
+    "spend_share_display": "1.5%",
+    "skus_single_sourced": 0,
+    "line_down_gap_weeks": 0,
+    "concentration_score": 17.62
+  },
+  "brief": null,
+  "violations": [
+    "V2: Research conducted across two independen",
+    "V2: No contractual clauses for SUP-011 (Bosc",
+    "V3: https://www.flexport.com/blog/middle-east-escalation-disrupts-global-ocean-and-air-freight-formats/",
+    "V5: contract_implications"
+  ],
+  "meta": {
+    "turns": 3,
+    "forced": false,
+    "dropped_findings": 0,
+    "cached": false,
+    "generated_at": "2026-06-24T16:26:26.527351+00:00"
+  }
+}

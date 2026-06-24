@@ -1,0 +1,27 @@
+{
+  "supplier_id": "SUP-007",
+  "supplier_name": "Marmara Steel",
+  "profile": {
+    "spend_share": 0.075,
+    "spend_share_display": "7.5%",
+    "skus_single_sourced": 0,
+    "line_down_gap_weeks": 0,
+    "concentration_score": 28.12
+  },
+  "brief": null,
+  "violations": [
+    "V3: CLAUSE: Force Majeure",
+    "V3: CLAUSE: Price Adjustment",
+    "V3: CLAUSE: Delivery Lead Time",
+    "V3: CLAUSE: Supplier Financial Health Disclosure",
+    "V3: CLAUSE: Supplier Financial Health Disclosure",
+    "V3: CLAUSE: Price Adjustment"
+  ],
+  "meta": {
+    "turns": 3,
+    "forced": false,
+    "dropped_findings": 1,
+    "cached": false,
+    "generated_at": "2026-06-24T16:04:38.099588+00:00"
+  }
+}

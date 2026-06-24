@@ -2,13 +2,22 @@ import json
 import os
 from datetime import datetime, timezone
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import APIKeyHeader
 
 from brief.render import fmt
 from pipeline.graph import run_assessment
 from profile_core.builder import build_profile
 from profile_core.loader import load_suppliers
+
+_API_SECRET = os.environ.get("API_SECRET")  # None means no auth enforced
+
+
+def _check_secret(x_api_secret: str | None):
+    if _API_SECRET and x_api_secret != _API_SECRET:
+        raise HTTPException(status_code=401, detail="invalid or missing API secret")
+
 
 app = FastAPI()
 
@@ -88,7 +97,8 @@ def suppliers():
 
 
 @app.post("/api/risk-brief/{supplier_id}")
-def risk_brief(supplier_id: str, fresh: bool = False):
+def risk_brief(supplier_id: str, fresh: bool = False,
+               x_api_secret: str | None = Header(default=None)):
     os.makedirs(CACHE_DIR, exist_ok=True)
     path = os.path.join(CACHE_DIR, f"{supplier_id}.json")
     if not fresh and os.path.exists(path):
@@ -96,6 +106,7 @@ def risk_brief(supplier_id: str, fresh: bool = False):
             resp = json.load(f)
         resp["meta"]["cached"] = True
         return resp
+    _check_secret(x_api_secret)  # only checked when fresh=True (cached path returns above)
     try:
         state = run_assessment(supplier_id)
     except KeyError:

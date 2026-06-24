@@ -1,0 +1,25 @@
+{
+  "supplier_id": "SUP-005",
+  "supplier_name": "Jiangxi Copper Tube",
+  "profile": {
+    "spend_share": 0.08,
+    "spend_share_display": "8.0%",
+    "skus_single_sourced": 0,
+    "line_down_gap_weeks": 0,
+    "concentration_score": 14.0
+  },
+  "brief": null,
+  "violations": [
+    "V2: Immediately retrieve and legally review ",
+    "V2: The full text of the SUP-005 master supp",
+    "V3: UNCONFIRMED \u2014 contract SUP-005 not retrieved; no clause references available",
+    "V3: UNCONFIRMED \u2014 contract SUP-005 not retrieved; no clause references available"
+  ],
+  "meta": {
+    "turns": 3,
+    "forced": false,
+    "dropped_findings": 5,
+    "cached": false,
+    "generated_at": "2026-06-24T15:53:12.497887+00:00"
+  }
+}

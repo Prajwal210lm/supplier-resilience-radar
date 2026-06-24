@@ -1,4 +1,5 @@
 const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const FRESH_SECRET = process.env.NEXT_PUBLIC_FRESH_SECRET || "";
 
 export type SupplierRow = {
   supplier_id: string;
@@ -48,10 +49,13 @@ export async function runRiskBrief(
   id: string,
   fresh: boolean
 ): Promise<RiskBriefResponse> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (fresh && FRESH_SECRET) headers["x-api-secret"] = FRESH_SECRET;
   const r = await fetch(
     `${BASE}/api/risk-brief/${id}${fresh ? "?fresh=true" : ""}`,
-    { method: "POST" }
+    { method: "POST", headers }
   );
+  if (r.status === 401) throw new Error("Live research is not available on this deployment.");
   if (r.status === 404) throw new Error("supplier not found");
   if (!r.ok) throw new Error("assessment failed");
   return r.json();

@@ -1,0 +1,140 @@
+{
+  "supplier_id": "SUP-002",
+  "supplier_name": "Zhejiang Scroll Tech",
+  "profile": {
+    "spend_share": 0.11,
+    "spend_share_display": "11.0%",
+    "skus_single_sourced": 2,
+    "line_down_gap_weeks": 2,
+    "concentration_score": 29.25
+  },
+  "brief": {
+    "concentration_profile": [
+      {
+        "text": "Zhejiang Scroll Tech represents 11.0% of total strategic procurement spend and 37.9% of scroll compressor category spend \u2014 a meaningful concentration in a single foreign supplier. Across the finished goods portfolio, 6 chiller models depend on components sourced from this supplier, of which 2 SKUs carry no qualified alternative source whatsoever. On-hand inventory provides only 8 weeks of cover on critical items, against a replacement lead time of 10 weeks, yielding a line-down gap of 2 weeks \u2014 the window within which a supply failure would halt assembly before any corrective action could take effect. The composite concentration score for this supplier stands at 29.2 out of one hundred. For broader context, the top five suppliers collectively account for 55.0% of total strategic spend of AED AED 480.0M, and 50.0% of that spend flows through single-source relationships, underscoring that this supplier sits within a structurally concentrated portfolio.",
+        "citations": []
+      }
+    ],
+    "risk_signals": [
+      {
+        "text": "Zhejiang Scroll Tech carries inherent opacity risk: no public company profile, financial statements, ownership structure, or regulatory record could be identified for this named entity. While the broader Zhejiang compressor cluster is commercially active, the inability to independently verify the supplier's financial health, production capacity, or ownership stability constitutes a risk signal in its own right \u2014 particularly given that 2 SKUs carry no qualified alternative.",
+        "citations": [
+          "https://www.accio.com/supplier/china-compressor-manufacturer"
+        ]
+      },
+      {
+        "text": "The US\u2013China trade relationship has undergone extreme tariff volatility in the current period. Tariffs peaked sharply before a truce reduced them under a baseline-plus-surcharge structure, a second extension was agreed in August of this year, and the USTR has since proposed an additional increment under a new forced-labour investigation. Even though the manufacturer is GCC-based and not a US importer, this regime creates order-book volatility, capacity reallocation pressure, and input-cost inflation across Chinese export manufacturers \u2014 all of which can degrade delivery reliability and pricing stability for GCC buyers.",
+        "citations": [
+          "https://www.china-briefing.com/news/us-china-tariff-rates-2025/"
+        ]
+      },
+      {
+        "text": "China has progressively expanded its export-control regime, introducing new licensing requirements for multiple medium and heavy rare-earth elements \u2014 including terbium, dysprosium, and gadolinium \u2014 and adding restrictions on tungsten, tellurium, bismuth, molybdenum, and indium. These materials are inputs to the advanced motors and electronics used in scroll compressor production. Export licensing controls at the sub-tier level can slow Zhejiang Scroll Tech's own inbound supply chain, extending lead times upstream and narrowing the manufacturer's already limited 2-week buffer.",
+        "citations": [
+          "https://www.hklaw.com/en/insights/publications/2025/04/chinas-comprehensive-retaliation-against-us-tariffs"
+        ]
+      },
+      {
+        "text": "Ningbo-Zhoushan port \u2014 the primary export gateway for Zhejiang-based manufacturers \u2014 is among the world's most congested container hubs. Port dwell times have tripled at peak periods, with documented delays reaching up to several weeks at Ningbo and other major Asian transshipment ports. Given the manufacturer's 8-week on-hand cover and 10-week replacement lead time, a single delayed shipment could consume the entire line-down buffer before a replacement consignment arrives.",
+        "citations": [
+          "https://www.searates.com/blog/post/delays-increase-by-300-in-world-ports-key-insights-about-the-summer-peak-collapse"
+        ]
+      },
+      {
+        "text": "The Strait of Hormuz \u2014 the sole deep-water entry into the Arabian Gulf \u2014 has experienced severe disruption from US\u2013Iran tensions. Iran has threatened full closure of the Strait, MSC declared an end-of-voyage for Persian Gulf shipments, commercial vessel transits dropped to near-zero with AIS transponders off, and a very large volume of deep-sea TEU capacity was estimated to be trapped in the Gulf. For a GCC industrial chiller manufacturer receiving compressors from Ningbo, even a brief closure is a direct production-stopping event: with only a 2-week line-down gap and 2 single-sourced SKUs, assembly could halt before alternative arrangements can be activated.",
+        "citations": [
+          "https://www.flexport.com/blog/middle-east-escalation-disrupts-global-ocean-and-air-freight-networks/"
+        ]
+      }
+    ],
+    "contract_implications": [
+      {
+        "text": "The force majeure clause relieves the supplier of all liability if performance is prevented by government action or export-control and licensing action, provided written notice is given within the stipulated window. Given that China's expanding export-control regime explicitly covers the materials used in compressor production, this clause could lawfully be invoked by Zhejiang Scroll Tech at short notice \u2014 leaving the manufacturer with no contractual remedy and bearing the entire disruption risk.",
+        "citations": [
+          "SUP-002 Clause 2"
+        ]
+      },
+      {
+        "text": "The price and adjustment clause fixes unit prices for rolling twelve-month periods with no intra-period adjustment mechanism and no tariff pass-through provision. While this shields the manufacturer from mid-year cost increases, it simultaneously places the financial burden of tariff escalation and input-cost inflation on the supplier during the contract year \u2014 creating an incentive to deprioritise orders, slow fulfilment, or seek sharply higher prices at renewal.",
+        "citations": [
+          "SUP-002 Clause 6"
+        ]
+      },
+      {
+        "text": "The quality SLA and liability clause caps liquidated damages for delay at a modest percentage per week of the affected purchase order value, with an aggregate ceiling expressed as a single-digit percentage of that same order value. The supplier's total liability is further capped at the value of the affected purchase order. These caps are materially insufficient relative to the production-loss exposure of a line-down event for an industrial chiller OEM: contractual remedies will substantially undercompensate actual losses if a delay triggers an assembly stoppage.",
+        "citations": [
+          "SUP-002 Clause 7"
+        ]
+      },
+      {
+        "text": "The alternative sourcing clause explicitly preserves the buyer's right to qualify and purchase equivalent scroll compressors from additional suppliers at its sole discretion, with no sole-source obligation imposed on the manufacturer. This is a positive contractual protection: dual-sourcing or qualification of backup suppliers can begin immediately without any risk of breach \u2014 a critical enabler given the 2-week production vulnerability.",
+        "citations": [
+          "SUP-002 Clause 5"
+        ]
+      },
+      {
+        "text": "The termination clause permits the buyer to exit the agreement for convenience on written notice, or for uncured material breach on a shorter notice period. The convenience termination window, however, is substantially longer than the 2-week line-down gap \u2014 meaning that exercising the termination right alone cannot protect production continuity. The termination clause is an orderly exit tool, not a business-continuity mechanism.",
+        "citations": [
+          "SUP-002 Clause 8"
+        ]
+      }
+    ],
+    "recommended_actions": [
+      {
+        "text": "Immediately initiate qualification of at least one alternative scroll compressor supplier \u2014 drawing on the commercially active Zhejiang supplier cluster or other qualified markets \u2014 to eliminate the single-source exposure on 2 critical SKUs. The alternative sourcing clause provides unobstructed contractual authority to do so, and the 2-week line-down gap makes this the highest-priority action.",
+        "citations": [
+          "SUP-002 Clause 5",
+          "https://www.accio.com/supplier/china-compressor-manufacturer"
+        ]
+      },
+      {
+        "text": "Increase safety stock on single-sourced SKUs to close the gap between on-hand cover of 8 weeks and the replacement lead time of 10 weeks. Target a minimum buffer that exceeds the replacement lead time by a margin sufficient to absorb Ningbo port delays of two or more weeks, as documented in current freight data.",
+        "citations": [
+          "https://www.searates.com/blog/post/delays-increase-by-300-in-world-ports-key-insights-about-the-summer-peak-collapse",
+          "https://www.flexport.com/blog/middle-east-escalation-disrupts-global-ocean-and-air-freight-networks/"
+        ]
+      },
+      {
+        "text": "At the next contract renewal, negotiate an amendment to the force majeure clause to narrow its scope with respect to foreseeable, ongoing export-control risks \u2014 either by requiring the supplier to maintain a licensed sub-tier supply chain as a contractual obligation, or by introducing a shared-risk mechanism when China export-control disruptions are the proximate cause of non-delivery.",
+        "citations": [
+          "SUP-002 Clause 2",
+          "https://www.hklaw.com/en/insights/publications/2025/04/chinas-comprehensive-retaliation-against-us-tariffs"
+        ]
+      },
+      {
+        "text": "Introduce a tariff pass-through and cost-escalation clause at renewal to replace the current fixed-price mechanism. The present arrangement concentrates financial pressure on the supplier during years of high tariff volatility, raising the risk of order deprioritisation or abrupt price demands at renewal \u2014 both of which threaten supply reliability.",
+        "citations": [
+          "SUP-002 Clause 6",
+          "https://www.china-briefing.com/news/us-china-tariff-rates-2025/"
+        ]
+      },
+      {
+        "text": "Seek to renegotiate the liquidated damages and liability cap upward at renewal, anchoring the cap to the manufacturer's demonstrable production-loss cost per line-down week rather than to the purchase order value alone. The current cap substantially undercompensates the actual exposure created by the 2-week vulnerability.",
+        "citations": [
+          "SUP-002 Clause 7"
+        ]
+      },
+      {
+        "text": "Establish a Strait of Hormuz contingency protocol, including pre-agreed air-freight escalation triggers for single-sourced SKUs and a nominated alternative discharge port arrangement, in coordination with the freight forwarder. The documented near-closure of the Strait and its direct impact on GCC port access make this a live operational risk requiring a standing response plan, not an ad-hoc one.",
+        "citations": [
+          "https://www.flexport.com/blog/middle-east-escalation-disrupts-global-ocean-and-air-freight-networks/"
+        ]
+      }
+    ],
+    "confidence": [
+      "No independent verification of Zhejiang Scroll Tech's financial health, solvency, or distress signals was possible: the named entity carries no public financial disclosures, credit ratings, or regulatory filings in available sources. Supplier-specific financial risk therefore cannot be quantified.",
+      "Ownership structure and any recent change-of-control events for Zhejiang Scroll Tech could not be established. The risk of undisclosed ownership changes \u2014 including acquisition by a sanctioned or state-linked entity \u2014 remains unassessed.",
+      "Production capacity, utilisation rates, and capacity allocation across Zhejiang Scroll Tech's customer base are unknown. It is not possible to determine what share of the supplier's output is committed to the manufacturer versus other buyers, nor how capacity would be allocated in a shortage.",
+      "Sub-tier supply chain composition for Zhejiang Scroll Tech \u2014 including which specific rare-earth or critical mineral inputs it sources, from which sub-suppliers, and whether it holds buffer stock of restricted materials \u2014 could not be determined from available public data.",
+      "No information was found on whether Zhejiang Scroll Tech holds the export licences now required under China's expanded critical-mineral control regime, or whether it has experienced or anticipates licensing delays for its own inbound materials."
+    ]
+  },
+  "violations": [],
+  "meta": {
+    "turns": 3,
+    "forced": false,
+    "dropped_findings": 0,
+    "cached": false,
+    "generated_at": "2026-06-24T15:39:05.878581+00:00"
+  }
+}

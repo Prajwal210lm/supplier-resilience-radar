@@ -1,0 +1,31 @@
+{
+  "supplier_id": "SUP-006",
+  "supplier_name": "Bharat Copper Works",
+  "profile": {
+    "spend_share": 0.08,
+    "spend_share_display": "8.0%",
+    "skus_single_sourced": 0,
+    "line_down_gap_weeks": 2,
+    "concentration_score": 19.0
+  },
+  "brief": null,
+  "violations": [
+    "V2: Bharat Copper Works (SUP-006) accounts f",
+    "V2: {{skus_dependent}} finished chiller mode",
+    "V2: The composite concentration score for SU",
+    "V2: Research conducted across all standard r",
+    "V2: Conduct emergency contract remediation: ",
+    "V2: Portfolio-level concentration review: Th",
+    "V2: No contract provisions were retrievable ",
+    "V2: The specific copper cathode supplier bas",
+    "V3: SUP-006 contract \u2014 no clause references retrievable",
+    "V3: SUP-006 contract \u2014 no clause references retrievable"
+  ],
+  "meta": {
+    "turns": 3,
+    "forced": false,
+    "dropped_findings": 0,
+    "cached": false,
+    "generated_at": "2026-06-24T15:58:28.335169+00:00"
+  }
+}

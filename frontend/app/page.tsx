@@ -138,6 +138,9 @@ export default function Home() {
   const [result, setResult] = useState<RiskBriefResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [loadingFresh, setLoadingFresh] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     getSuppliers()
@@ -148,18 +151,46 @@ export default function Home() {
       .catch(() => setLoadError("Could not reach the assessment service."));
   }, []);
 
-  async function handleRun() {
+  function onRun() {
     if (!selected) return;
-    setLoading(true);
+    setNotice(null);
+    if (fresh) {
+      setShowConfirm(true); // gate live runs behind the modal
+      return;
+    }
+    assess(false);
+  }
+
+  async function assess(useFresh: boolean) {
+    setShowConfirm(false);
     setError(null);
+    setNotice(null);
     setResult(null);
+    setLoadingFresh(useFresh);
+    setLoading(true);
     try {
-      const r = await runRiskBrief(selected, fresh);
-      setResult(r);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "assessment failed");
+      const data = await runRiskBrief(selected, useFresh);
+      setResult(data);
+    } catch {
+      if (useFresh) {
+        // live run failed (timeout / resource limit) — fall back to the cached brief
+        try {
+          const cached = await runRiskBrief(selected, false);
+          setResult(cached);
+          setNotice(
+            "Live research didn't finish this time — showing the most recent cached brief."
+          );
+        } catch {
+          setError(
+            "The live assessment could not be completed. Please try again, or untick live research to view the cached brief."
+          );
+        }
+      } else {
+        setError("This assessment could not be loaded. Please try another supplier.");
+      }
     } finally {
       setLoading(false);
+      setLoadingFresh(false);
     }
   }
 
@@ -243,11 +274,11 @@ export default function Home() {
             </div>
 
             <button
-              onClick={handleRun}
+              onClick={onRun}
               disabled={loading || !selected}
               className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-navy)] px-6 py-3 font-sans text-[0.92rem] font-medium text-white transition-all duration-200 hover:bg-[var(--color-ink)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-55 cursor-pointer"
             >
-              {loading ? "Assessing…" : "Run Assessment"}
+              {loading ? "Running…" : "Run Assessment"}
               {!loading && (
                 <svg
                   width="15"
@@ -315,12 +346,14 @@ export default function Home() {
             <span className="relative h-2.5 w-2.5 rounded-full bg-[var(--color-accent)]" />
           </div>
           <p className="mt-7 font-display text-xl text-[var(--color-navy)]">
-            Researching supplier risk…
+            {loadingFresh ? "Running live research" : "Loading brief…"}
           </p>
-          <p className="mt-2 max-w-[24rem] text-[0.88rem] leading-relaxed text-[var(--color-faint)]">
-            This runs live web research and contract analysis — up to a few
-            minutes on a fresh run.
-          </p>
+          {loadingFresh && (
+            <p className="mt-2 max-w-[26rem] text-[0.88rem] leading-relaxed text-[var(--color-faint)]">
+              Fetching current news, country and port-risk signals, and contract
+              terms. This usually takes 2–3 minutes.
+            </p>
+          )}
         </div>
       )}
 
@@ -354,6 +387,13 @@ export default function Home() {
       {/* Result */}
       {result && !loading && (
         <article className="rise mx-auto mt-16 max-w-[720px]">
+          {/* Informational notice (e.g. cached fallback after a failed live run) */}
+          {notice && (
+            <div className="mb-8 rounded-lg bg-[#1B2A4A]/[0.06] px-4 py-3 text-[0.85rem] leading-relaxed text-[#1B2A4A]">
+              {notice}
+            </div>
+          )}
+
           {/* Brief masthead */}
           <div className="text-center">
             <p className="eyebrow text-[var(--color-accent)]">
@@ -507,6 +547,41 @@ export default function Home() {
             )}
           </div>
         </article>
+      )}
+
+      {/* Confirmation modal — gate every live (fresh) run */}
+      {showConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setShowConfirm(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-display text-xl text-[#1B2A4A]">Run live research?</h3>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              This fetches current news, country and port-risk signals, and analyzes
+              the supplier&apos;s contract in real time. It usually takes{" "}
+              <span className="font-semibold text-[#1B2A4A]">2–3 minutes</span> and
+              replaces the cached brief shown by default.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="rounded-md px-4 py-2 text-sm text-slate-600 hover:bg-slate-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => assess(true)}
+                className="rounded-md bg-[#1B2A4A] px-4 py-2 text-sm font-medium text-white hover:bg-[#24365c]"
+              >
+                Run live research
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );

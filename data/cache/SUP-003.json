@@ -1,0 +1,23 @@
+{
+  "supplier_id": "SUP-003",
+  "supplier_name": "Milano Controls Srl",
+  "profile": {
+    "spend_share": 0.09,
+    "spend_share_display": "9.0%",
+    "skus_single_sourced": 14,
+    "line_down_gap_weeks": 6,
+    "concentration_score": 70.75
+  },
+  "brief": null,
+  "violations": [
+    "V2: Milano Controls Srl (SUP-003) represents",
+    "V2: Italy's manufacturing PMI has fallen bel"
+  ],
+  "meta": {
+    "turns": 3,
+    "forced": false,
+    "dropped_findings": 0,
+    "cached": false,
+    "generated_at": "2026-06-24T15:45:34.743695+00:00"
+  }
+}
