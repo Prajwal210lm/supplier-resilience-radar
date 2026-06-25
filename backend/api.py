@@ -31,6 +31,7 @@ app.add_middleware(
         "http://localhost:3001",
         "http://localhost:3002",
     ],
+    allow_origin_regex=r"https://supplier-resilience-radar[a-z0-9-]*\.vercel\.app",
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -1,129 +1,158 @@
 @import "tailwindcss";
 
-/* ------------------------------------------------------------------ *
- *  Supplier Resilience Radar — editorial consulting palette
- *  Navy / slate authority + a single warm severity accent (amber).
- * ------------------------------------------------------------------ */
+/* ================================================================== *
+ *  Supplier Resilience Radar — "risk-intelligence terminal"
+ *  Near-black navy base · electric-blue accent · amber highlight ·
+ *  severity red / amber / emerald. Dark, sharp, instrument-grade.
+ * ================================================================== */
 @theme inline {
   --font-sans: var(--font-inter);
-  --font-display: var(--font-playfair);
-  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  --font-display: var(--font-space);
+  --font-mono: var(--font-jetbrains);
 
-  --color-ink: #0b1220; /* near-black navy, primary text */
-  --color-navy: #0f172a; /* slate-900 */
-  --color-slate: #334155; /* slate-700 */
-  --color-muted: #64748b; /* slate-500 */
-  --color-faint: #94a3b8; /* slate-400 */
-  --color-line: #e2e8f0; /* slate-200 hairlines */
-  --color-line-soft: #eef2f6;
-  --color-paper: #f7f9fc; /* page background */
-  --color-card: #ffffff;
+  /* surfaces (deep → raised) */
+  --color-base: #060912;
+  --color-surface: #0a0f1d;
+  --color-panel: #0e1426;
+  --color-raised: #141c33;
 
-  --color-accent: #b45309; /* amber-700, the one accent */
-  --color-accent-soft: #fef3e2;
+  /* hairlines */
+  --color-line: #1c2542;
+  --color-line-strong: #2a3658;
 
-  --color-sev-critical: #b91c1c;
-  --color-sev-elevated: #b45309;
-  --color-sev-moderate: #475569;
+  /* text tiers (ink-3 tuned to clear 4.5:1 on the panel surfaces it sits on) */
+  --color-ink: #eef2fc; /* primary, near-white */
+  --color-ink-2: #aeb9d4; /* secondary */
+  --color-ink-3: #7d8cad; /* muted / labels */
+
+  /* accent — electric blue. The bright shade is for text/borders/glows on the
+     dark base (high contrast); buttons use the darker --color-btn so white
+     labels clear WCAG AA 4.5:1. */
+  --color-accent: #4f8cff;
+  --color-accent-bright: #7aa6ff;
+  --color-accent-soft: rgba(79, 140, 255, 0.12);
+  --color-btn: #2f6ae0; /* white on this = 4.9:1 */
+  --color-btn-hover: #2257d6; /* white on this = 5.7:1 */
+
+  /* highlight — amber */
+  --color-amber: #ffb020;
+
+  /* severity (crit referenced directly in CSS; elev/low are derived in JS) */
+  --color-crit: #ff5470;
 }
 
 html {
-  background-color: var(--color-paper);
+  background-color: var(--color-base);
   color: var(--color-ink);
+  color-scheme: dark;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
+  font-family: var(--font-sans);
   color: var(--color-ink);
-  background-color: var(--color-paper);
-  /* faint editorial paper wash */
+  background-color: var(--color-base);
+  /* faint instrument backdrop: a cool radial wash + a fine grid that fades out */
   background-image:
-    radial-gradient(1200px 600px at 50% -10%, #ffffff 0%, rgba(255, 255, 255, 0) 60%),
-    linear-gradient(180deg, #ffffff 0%, var(--color-paper) 280px);
+    radial-gradient(1100px 620px at 50% -8%, rgba(79, 140, 255, 0.1), rgba(79, 140, 255, 0) 62%),
+    radial-gradient(900px 600px at 100% 0%, rgba(255, 176, 32, 0.05), rgba(255, 176, 32, 0) 55%),
+    linear-gradient(180deg, #070b16 0%, var(--color-base) 520px);
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
 
-/* Reading rhythm for the brief prose */
-.prose-reader p {
-  font-size: 1.0625rem; /* 17px */
-  line-height: 1.75;
-  color: var(--color-slate);
-  letter-spacing: 0.001em;
+/* A subtle dot-grid utility for hero / section backdrops. */
+.grid-backdrop {
+  background-image:
+    linear-gradient(rgba(79, 140, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 140, 255, 0.06) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 72%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 72%);
 }
 
-.prose-reader p + p {
-  margin-top: 0.85rem;
+/* Hairline panel + glass for cards */
+.panel {
+  background-color: color-mix(in oklab, var(--color-panel) 88%, transparent);
+  border: 1px solid var(--color-line);
+}
+.panel-raised {
+  background-color: var(--color-raised);
+  border: 1px solid var(--color-line-strong);
 }
 
-.eyebrow {
-  font-family: var(--font-sans);
+/* Mono label — the terminal voice */
+.kicker {
+  font-family: var(--font-mono);
   text-transform: uppercase;
-  letter-spacing: 0.22em;
-  font-weight: 600;
-  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  font-size: 0.66rem;
+  font-weight: 500;
 }
 
-/* Citation link — a quiet editorial reference, not a loud button */
+/* Quiet citation links */
 .cite-link {
-  color: var(--color-slate);
+  color: var(--color-ink-2);
   text-decoration: underline;
-  text-decoration-color: var(--color-faint);
+  text-decoration-color: var(--color-line-strong);
   text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-  transition: color 200ms ease, text-decoration-color 200ms ease;
+  transition: color 180ms ease, text-decoration-color 180ms ease;
 }
 .cite-link:hover {
-  color: var(--color-accent);
+  color: var(--color-accent-bright);
   text-decoration-color: var(--color-accent);
 }
 
-/* Clause badge — a small professional reference chip */
-.cite-badge {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.01em;
-  color: var(--color-navy);
-  background: #f1f5f9;
-  border: 1px solid var(--color-line);
-  border-radius: 5px;
-  padding: 0.15rem 0.5rem;
-  white-space: nowrap;
+/* Scrollbar — dark, slim */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-line-strong);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-3);
+  background-clip: content-box;
 }
 
-@keyframes radar-pulse {
-  0% {
-    transform: scale(0.85);
-    opacity: 0.55;
-  }
-  70% {
-    transform: scale(2.4);
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes soft-rise {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.rise {
-  animation: soft-rise 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+::selection {
+  background: rgba(79, 140, 255, 0.28);
+  color: #fff;
 }
 
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-  border-radius: 3px;
+  border-radius: 4px;
+}
+
+/* Radar sweep for the live-run loader */
+@keyframes radar-sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ping-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+  80% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -133,5 +162,6 @@ body {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
