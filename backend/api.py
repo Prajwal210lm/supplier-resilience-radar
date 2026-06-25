@@ -1,5 +1,7 @@
+import glob
 import json
 import os
+import re
 from datetime import datetime, timezone
 
 from fastapi import FastAPI, Header, HTTPException
@@ -27,12 +29,14 @@ app.add_middleware(
         "https://supplier-resilience-radar.vercel.app",
         "http://localhost:3000",
         "http://localhost:3001",
+        "http://localhost:3002",
     ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 CACHE_DIR = "data/cache"
+CONTRACTS_DIR = "data/contracts"
 
 
 def _claim_to_dict(c):
@@ -115,3 +119,16 @@ def risk_brief(supplier_id: str, fresh: bool = False,
     with open(path, "w") as f:
         json.dump(resp, f, indent=2)
     return resp
+
+
+@app.get("/api/contract/{supplier_id}")
+def contract(supplier_id: str):
+    # Guard against path traversal — only allow the SUP-NNN pattern.
+    if not re.fullmatch(r"SUP-\d+", supplier_id):
+        raise HTTPException(status_code=400, detail="invalid supplier id")
+    matches = glob.glob(os.path.join(CONTRACTS_DIR, f"{supplier_id}_*.md"))
+    if not matches:
+        raise HTTPException(status_code=404, detail="no contract on file")
+    with open(matches[0], encoding="utf-8") as f:
+        markdown = f.read()
+    return {"markdown": markdown, "supplier_id": supplier_id}
