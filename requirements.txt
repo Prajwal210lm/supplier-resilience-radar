@@ -1,7 +1,8 @@
+anthropic
 numpy
 sentence-transformers
 langgraph
 fastapi
-uvicorn
+uvicorn[standard]
 httpx
 pytest
