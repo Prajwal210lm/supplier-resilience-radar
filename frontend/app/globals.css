@@ -23,7 +23,7 @@
   /* text tiers (ink-3 tuned to clear 4.5:1 on the panel surfaces it sits on) */
   --color-ink: #eef2fc; /* primary, near-white */
   --color-ink-2: #aeb9d4; /* secondary */
-  --color-ink-3: #7d8cad; /* muted / labels */
+  --color-ink-3: #8d9cbe; /* muted / labels — lightened so muted text stays clearly legible on the dark base */
 
   /* accent — electric blue. The bright shade is for text/borders/glows on the
      dark base (high contrast); buttons use the darker --color-btn so white

@@ -58,7 +58,7 @@ export default function Architecture() {
                 <span className="h-1 w-1 rounded-full bg-[var(--color-line-strong)]" />
                 <span className="font-display text-[1.05rem] font-semibold text-[var(--color-ink)]">{s.name}</span>
               </div>
-              <p className="mt-2.5 text-[0.85rem] leading-relaxed text-[var(--color-ink-3)]">{s.line}</p>
+              <p className="mt-2.5 text-[0.85rem] leading-relaxed text-[var(--color-ink-2)]">{s.line}</p>
             </div>
           </motion.div>
         ))}

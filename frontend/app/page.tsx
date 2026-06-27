@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
+  getClauseSummary,
   getSuppliers,
   runRiskBrief,
   type RiskBriefResponse,
@@ -17,7 +18,6 @@ import {
   parseClause,
   severity,
   splitLead,
-  supplierBlurb,
 } from "@/lib/format";
 import { CountUp, Reveal } from "@/components/motion";
 import Gauge from "@/components/Gauge";
@@ -272,9 +272,11 @@ export default function Home() {
 
           {/* reference contracts */}
           <Reveal delay={0.1}>
-            <div className="mt-7 flex flex-wrap items-center gap-x-2 gap-y-2 text-[0.85rem] text-[var(--color-ink-3)]">
-              <span className="font-mono text-[0.72rem] uppercase tracking-[0.14em]">Reference contracts I wrote</span>
-              <span className="text-[var(--color-line-strong)]">·</span>
+            <div className="mt-7 flex flex-wrap items-center gap-x-2 gap-y-2 text-[0.9rem] leading-relaxed text-[var(--color-ink-2)]">
+              <span>
+                The four supplier contracts I wrote for this case study — the other suppliers have no
+                contract on file, which the tool surfaces honestly:
+              </span>
               {REFERENCE_CONTRACTS.map((c) => (
                 <a
                   key={c.id}
@@ -472,7 +474,7 @@ function CaseFile({ row }: { row: SupplierRow }) {
       <p className="mt-1 font-mono text-[0.74rem] uppercase tracking-[0.1em] text-[var(--color-ink-3)]">
         {row.country} · {row.category.replace(/_/g, " ")}
       </p>
-      <p className="mt-3 text-[0.88rem] leading-relaxed text-[var(--color-ink-2)]">{supplierBlurb(row.category)}.</p>
+      <p className="mt-3 text-[0.88rem] leading-relaxed text-[var(--color-ink-2)]">{row.description}</p>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-3">
@@ -488,6 +490,18 @@ function CaseFile({ row }: { row: SupplierRow }) {
           <div className="mt-0.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-[var(--color-ink-3)]">Spend share</div>
         </div>
       </div>
+
+      {/* plain-English captions so a non-expert understands the two figures */}
+      <dl className="mt-3 space-y-1.5">
+        <div className="text-[0.72rem] leading-snug text-[var(--color-ink-3)]">
+          <dt className="inline font-medium text-[var(--color-ink-2)]">Concentration —</dt>{" "}
+          <dd className="inline">0–100 risk score: how exposed GCI is to this one supplier (higher = more dangerous).</dd>
+        </div>
+        <div className="text-[0.72rem] leading-snug text-[var(--color-ink-3)]">
+          <dt className="inline font-medium text-[var(--color-ink-2)]">Spend share —</dt>{" "}
+          <dd className="inline">Share of GCI&apos;s total annual procurement spend that goes to this supplier.</dd>
+        </div>
+      </dl>
 
       <div className="mt-4 border-t border-[var(--color-line)] pt-3">
         {hasContract ? (
@@ -523,6 +537,28 @@ function Brief({
 }) {
   const sev = severity(result.profile.concentration_score);
   const p = result.profile;
+
+  // One-line clause summaries for this supplier (real data from the API; null for
+  // suppliers with no contract on file). Tracked per supplier id so it never
+  // shows a stale supplier's summaries.
+  const [loadedClauses, setLoadedClauses] = useState<{
+    id: string;
+    map: Record<string, string> | null;
+  }>({ id: "", map: null });
+  useEffect(() => {
+    let cancelled = false;
+    getClauseSummary(result.supplier_id)
+      .then((m) => {
+        if (!cancelled) setLoadedClauses({ id: result.supplier_id, map: m });
+      })
+      .catch(() => {
+        if (!cancelled) setLoadedClauses({ id: result.supplier_id, map: null });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [result.supplier_id]);
+  const clauseMap = loadedClauses.id === result.supplier_id ? loadedClauses.map : null;
 
   const NAV = [
     ["01", "Concentration", "b-concentration"],
@@ -664,25 +700,38 @@ function Brief({
                   return (
                     <Reveal key={i} delay={i * 0.04}>
                       <div className="rounded-xl border border-[var(--color-line)] bg-[var(--color-panel)]/60 p-5">
-                        <div className="flex flex-wrap items-center gap-2">
+                        <div className="space-y-2.5">
                           {clauses.length === 0 && others.length === 0 && (
                             <span className="font-mono text-[0.74rem] uppercase tracking-[0.12em] text-[var(--color-ink-3)]">Contract term</span>
                           )}
-                          {clauses.map((cl, j) => (
-                            <a
-                              key={`c${j}`}
-                              href={`/contract/${cl.sid}#clause-${cl.num}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-accent)]/40 bg-[var(--color-accent-soft)] px-3 py-1.5 font-mono text-[0.76rem] font-medium text-[var(--color-accent-bright)] transition-colors hover:bg-[var(--color-accent)]/20"
-                            >
-                              <Doc size={13} />
-                              {cl.sid} · Clause {cl.num}
-                              <ArrowUpRight size={12} />
-                            </a>
-                          ))}
+                          {clauses.map((cl, j) => {
+                            const summary =
+                              cl.sid === result.supplier_id ? clauseMap?.[String(cl.num)] : undefined;
+                            return (
+                              <div key={`c${j}`}>
+                                <a
+                                  href={`/contract/${cl.sid}#clause-${cl.num}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-accent)]/40 bg-[var(--color-accent-soft)] px-3 py-1.5 font-mono text-[0.76rem] font-medium text-[var(--color-accent-bright)] transition-colors hover:bg-[var(--color-accent)]/20"
+                                >
+                                  <Doc size={13} />
+                                  {cl.sid} · Clause {cl.num}
+                                  <ArrowUpRight size={12} />
+                                </a>
+                                {/* one-line gist of the clause (real summary from the API) */}
+                                {summary && (
+                                  <p className="mt-1.5 text-[0.85rem] italic leading-relaxed text-[var(--color-ink-3)]">{summary}</p>
+                                )}
+                              </div>
+                            );
+                          })}
                           {/* any non-clause (URL) sources are still shown — provenance is never dropped */}
-                          {others.map((cc, j) => <SourceChip key={`u${j}`} c={cc} />)}
+                          {others.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {others.map((cc, j) => <SourceChip key={`u${j}`} c={cc} />)}
+                            </div>
+                          )}
                         </div>
                         <p className="mt-3 text-[0.95rem] leading-relaxed text-[var(--color-ink-2)]">{c.text}</p>
                       </div>
@@ -732,11 +781,16 @@ function Brief({
               {brief.confidence.length === 0 ? (
                 <EmptyNote text="The agent did not flag any gaps in what it could establish." />
               ) : (
-                <ul className="space-y-2.5 border-l-2 border-[var(--color-line-strong)] pl-5">
+                <div className="grid gap-3">
                   {brief.confidence.map((s, i) => (
-                    <li key={i} className="text-[0.93rem] italic leading-relaxed text-[var(--color-ink-2)]">{s}</li>
+                    <div key={i} className="rounded-xl border border-[var(--color-line)] bg-[var(--color-panel)]/60 p-4">
+                      <span className="font-mono text-[0.62rem] font-medium uppercase tracking-[0.16em] text-[var(--color-ink-3)]">
+                        Could not establish
+                      </span>
+                      <p className="mt-1.5 text-[0.92rem] leading-relaxed text-[var(--color-ink-2)]">{cleanGap(s)}</p>
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
             </SectionShell>
           </div>
@@ -776,7 +830,13 @@ function Stat({ label, value, color }: { label: string; value: React.ReactNode; 
 }
 
 function EmptyNote({ text }: { text: string }) {
-  return <p className="text-[0.9rem] text-[var(--color-ink-3)]">{text}</p>;
+  return <p className="text-[0.9rem] text-[var(--color-ink-2)]">{text}</p>;
+}
+
+// Strip any leading markdown bullet markers so confidence gaps render as clean
+// prose rather than raw "* " / "- " text.
+function cleanGap(s: string): string {
+  return (s ?? "").replace(/^[\s*+•·-]+/, "").trim();
 }
 
 function MetricRow({ label, value, note }: { label: string; value: string; note: string }) {
@@ -786,7 +846,7 @@ function MetricRow({ label, value, note }: { label: string; value: string; note:
         <span className="font-sans text-[0.86rem] font-medium text-[var(--color-ink-2)]">{label}</span>
         <span className="font-display text-[1.05rem] font-semibold tabular-nums text-[var(--color-ink)]">{value}</span>
       </div>
-      <p className="mt-1.5 text-[0.8rem] leading-relaxed text-[var(--color-ink-3)]">{note}</p>
+      <p className="mt-1.5 text-[0.8rem] leading-relaxed text-[var(--color-ink-2)]">{note}</p>
     </div>
   );
 }

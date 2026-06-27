@@ -8,6 +8,7 @@ export type SupplierRow = {
   category: string;
   concentration_score: number;
   spend_share: number;
+  description: string;
 };
 
 export type Claim = { text: string; citations: string[] };
@@ -59,4 +60,16 @@ export async function runRiskBrief(
   if (r.status === 404) throw new Error("supplier not found");
   if (!r.ok) throw new Error("assessment failed");
   return r.json();
+}
+
+// One-line plain-English summaries of each contract clause, keyed by clause
+// number (string). Returns null when the supplier has no contract on file (404).
+export type ClauseSummaries = Record<string, string>;
+
+export async function getClauseSummary(id: string): Promise<ClauseSummaries | null> {
+  const r = await fetch(`${BASE}/api/clause-summary/${id}`);
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error("failed to load clause summaries");
+  const data = await r.json();
+  return (data.clauses ?? null) as ClauseSummaries | null;
 }

@@ -55,14 +55,6 @@ export function formatDate(iso: string): string {
   }
 }
 
-// A neutral one-line description derived strictly from the supplier's real
-// category. Deliberately no invented product specifics — the only fields the API
-// returns are id/name/country/category/score/spend_share, so the blurb must not
-// assert anything beyond the category itself.
-export function supplierBlurb(category: string): string {
-  return `Supplies ${category.replace(/_/g, " ")} into GCI's production line`;
-}
-
 // The four case-study suppliers that have a contract document on file.
 export const CONTRACT_IDS = new Set(["SUP-001", "SUP-002", "SUP-003", "SUP-004"]);
 export const REFERENCE_CONTRACTS: { id: string; name: string }[] = [

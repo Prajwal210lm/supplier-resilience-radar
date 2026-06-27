@@ -38,6 +38,7 @@ app.add_middleware(
 
 CACHE_DIR = "data/cache"
 CONTRACTS_DIR = "data/contracts"
+CLAUSE_SUMMARIES_PATH = "data/clause_summaries.json"
 
 
 def _claim_to_dict(c):
@@ -86,6 +87,7 @@ def load_suppliers_summary():
             "supplier_id": p.supplier_id, "name": p.name, "country": p.country,
             "category": p.category, "concentration_score": p.concentration_score,
             "spend_share": p.spend_share,
+            "description": s.get("description", ""),
         })
     rows.sort(key=lambda r: r["concentration_score"], reverse=True)
     return rows
@@ -133,3 +135,18 @@ def contract(supplier_id: str):
     with open(matches[0], encoding="utf-8") as f:
         markdown = f.read()
     return {"markdown": markdown, "supplier_id": supplier_id}
+
+
+@app.get("/api/clause-summary/{supplier_id}")
+def clause_summary(supplier_id: str):
+    if not re.fullmatch(r"SUP-\d+", supplier_id):
+        raise HTTPException(status_code=400, detail="invalid supplier id")
+    try:
+        with open(CLAUSE_SUMMARIES_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="no clause summaries available")
+    clauses = data.get(supplier_id)
+    if not clauses:
+        raise HTTPException(status_code=404, detail="no clause summaries on file")
+    return {"supplier_id": supplier_id, "clauses": clauses}
