@@ -42,7 +42,7 @@ const SCOPE: { label: string; body: string }[] = [
   {
     label: "Contracts",
     body:
-      "I wrote 4 supplier contracts, not 25. They cover the full risk spectrum: a single-source trap (Rheinkomp), a dual-source-friendly deal (Zhejiang Scroll), a buyer-protective contract (Milano Controls), and a neutral baseline (AlpenHX). That is enough to prove the contract-retrieval and analysis layer, including a deliberate test that the system never pulls one supplier's clauses when assessing another. Writing 21 more for commodity suppliers like packaging and fasteners would make the demo look bigger without testing anything new, and several of those would not realistically have detailed contracts at all. For suppliers without one, the tool reports the gap rather than inventing terms.",
+      "I wrote 4 supplier contracts, not 25. They cover the full risk spectrum: a single-source trap (Rheinkomp), a dual-source-friendly deal (Zhejiang Scroll), a buyer-protective contract (Milano Controls), and a neutral baseline (AlpenHX). That is enough to show the contract reading and analysis working, including a deliberate test that the system never pulls one supplier's clauses when assessing another. Writing 21 more for commodity suppliers like packaging and fasteners would make the demo look bigger without testing anything new, and several of those would not realistically have detailed contracts at all. For suppliers without one, the tool reports the gap rather than inventing terms.",
   },
   {
     label: "Data",
@@ -57,7 +57,7 @@ const SCOPE: { label: string; body: string }[] = [
   {
     label: "Production path",
     body:
-      "A production version would plug in premium risk feeds (credit ratings, financial-distress signals), scheduled monitoring instead of on-demand runs, and a human review step before any recommendation. The architecture already leaves clean seams for these.",
+      "A production version would add premium risk feeds (credit ratings and financial-distress signals), run on a schedule instead of on demand, and put a human review step before any recommendation. The design already leaves room to slot all three in.",
   },
 ];
 
@@ -273,23 +273,6 @@ export default function Home() {
                   <span className="text-[var(--color-ink)]">every claim is traced to a source it actually found</span>.
                 </p>
               </Reveal>
-              <Reveal delay={0.18}>
-                <div className="mt-8 flex flex-wrap items-center gap-3">
-                  <a
-                    href="#console"
-                    className="group inline-flex items-center gap-2 rounded-xl bg-[var(--color-btn)] px-5 py-3 font-sans text-[0.92rem] font-medium text-white transition-all hover:bg-[var(--color-btn-hover)]"
-                  >
-                    Assess a supplier
-                    <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
-                  </a>
-                  <a
-                    href="#how"
-                    className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-line-strong)] px-5 py-3 font-sans text-[0.92rem] font-medium text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-accent)]/50 hover:text-[var(--color-ink)]"
-                  >
-                    How I built it
-                  </a>
-                </div>
-              </Reveal>
             </div>
 
             {/* visual hook — a decorative instrument, no fabricated data */}
@@ -308,13 +291,13 @@ export default function Home() {
             </div>
             <p className="mt-4 max-w-[58rem] text-[1.02rem] leading-relaxed text-[var(--color-ink-2)]">
               Gulf Cooling Industries (GCI) is a fictional UAE manufacturer of industrial chillers and
-              district-cooling systems, created for this case study. It is not a real company. GCI spends{" "}
-              <span className="text-[var(--color-ink)]">AED 480M a year across 25 strategic suppliers</span> in
-              its supply chain, importing critical compressors and components from a few concentrated
-              overseas sources. If a single-source supplier fails, the production line stops for weeks.
-              Everyone knows the exposure exists, but nobody checks it ahead of time, because assessing
-              one supplier means cross-referencing supply-chain data, live external news, and the
-              contract. That is days of analyst work each time.{" "}
+              district-cooling systems, built for this case study. It is not a real company. GCI spends{" "}
+              <span className="text-[var(--color-ink)]">AED 480M a year across 25 strategic suppliers</span>,
+              importing critical compressors and components from a few concentrated overseas sources. If a
+              single-source supplier fails, the production line can stop for weeks. Everyone knows the risk
+              is there, but nobody checks it in advance, because assessing one supplier means pulling
+              together how much the business depends on them, the live news around them, and the contract.
+              That is days of analyst work every time.{" "}
               <span className="text-[var(--color-ink)]">I built this tool to produce that assessment on demand.</span>
             </p>
           </div>
@@ -323,18 +306,37 @@ export default function Home() {
         {/* ── 3. HOW I APPROACHED IT (plain language, before any technical detail) ── */}
         <section id="approach" className="mt-24 scroll-mt-20">
           <Reveal>
-            <p className="kicker text-[var(--color-accent)]">How I approached it</p>
+            <p className="kicker text-[var(--color-accent)]">In plain terms</p>
             <h2 className="mt-4 max-w-[40rem] font-display text-[2rem] font-semibold leading-tight tracking-[-0.01em] sm:text-[2.4rem]">
-              In plain terms
+              How I approached it
             </h2>
-            <p className="mt-5 max-w-[54rem] text-[1.05rem] leading-relaxed text-[var(--color-ink-2)]">
-              To assess one supplier you normally cross-check three things: how much the business
-              depends on them, what is happening to them right now in the news, and what the contract
-              actually allows. I taught an AI agent to do all three and write the answer up the way an
-              analyst would. The strict rule is simple: it can only state a number the code calculated,
-              and it can only cite a fact it genuinely found. If it cannot back something up, the system
-              refuses to show it.
-            </p>
+            <div className="mt-5 max-w-[54rem] space-y-4 text-[1.05rem] leading-relaxed text-[var(--color-ink-2)]">
+              <p>
+                Checking one supplier normally means pulling together three separate things: how much the
+                business depends on that supplier, what is happening to them right now in the news and on
+                the trade routes, and what their contract actually allows. I built an AI agent that does
+                all three and writes it up the way an analyst would, in minutes instead of days.
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--color-ink)]">What it produces:</span> for any
+                supplier, a risk score out of 100 and a short, board-ready brief. It covers where the
+                supplier sits in the supply chain, the live risks around it, what its contract lets the
+                supplier get away with, and a ranked list of actions to take.
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--color-ink)]">The one strict rule:</span> the
+                agent can only state a number the code calculated, and can only cite a fact it actually
+                retrieved. If it cannot back something up, the system refuses to show it, so nothing in the
+                brief is invented.
+              </p>
+              <p>
+                <span className="font-semibold text-[var(--color-ink)]">What to expect on this page:</span>{" "}
+                scroll down to the console, pick a supplier, and run an assessment. Most load instantly from
+                a saved result. The clearest example is SUP-001, a single-source German compressor supplier
+                that scores 94 out of 100. You can also force a live run to watch the agent research in real
+                time.
+              </p>
+            </div>
           </Reveal>
         </section>
 
@@ -387,9 +389,9 @@ export default function Home() {
             </h2>
             <p className="mt-4 max-w-[58rem] text-[1rem] leading-relaxed text-[var(--color-ink-2)]">
               I wrote four representative supplier contracts that span the risk spectrum, from a
-              single-source trap to a buyer-protective deal, to show the contract-retrieval and
-              analysis layer working. The other suppliers in the dataset have no contract on file,
-              which the tool reports honestly rather than inventing terms.
+              single-source trap to a buyer-protective deal, so the tool has real contracts to read and
+              analyse. The other suppliers in the dataset have no contract on file, which the tool reports
+              honestly rather than inventing terms.
             </p>
           </Reveal>
 
