@@ -117,10 +117,22 @@ export default function ContractPage() {
     <div className="min-h-full">
       <header className="sticky top-0 z-40 border-b border-[var(--color-line)] bg-[var(--color-base)]/80 backdrop-blur-md">
         <div className="mx-auto flex h-14 w-full max-w-[820px] items-center justify-between px-6 sm:px-8">
-          <Link href="/" className="inline-flex items-center gap-2 font-display text-[0.9rem] font-semibold text-[var(--color-ink)] transition-colors hover:text-[var(--color-accent-bright)]">
-            <ArrowRight size={14} className="rotate-180" />
-            Resilience Radar
-          </Link>
+          <div className="flex items-center gap-3.5">
+            <Link
+              href="/contracts"
+              className="inline-flex items-center gap-2 font-display text-[0.9rem] font-semibold text-[var(--color-ink)] transition-colors hover:text-[var(--color-accent-bright)]"
+            >
+              <ArrowRight size={14} className="rotate-180" />
+              All contracts
+            </Link>
+            <span className="h-4 w-px bg-[var(--color-line-strong)]" />
+            <Link
+              href="/"
+              className="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-[var(--color-ink-3)] transition-colors hover:text-[var(--color-ink-2)]"
+            >
+              Home
+            </Link>
+          </div>
           <span className="inline-flex items-center gap-1.5 font-mono text-[0.66rem] uppercase tracking-[0.16em] text-[var(--color-ink-3)]">
             <Doc size={12} /> Reference contract · {id}
           </span>

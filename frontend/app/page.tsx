@@ -202,13 +202,6 @@ export default function Home() {
             <span className="hidden font-mono text-[0.66rem] uppercase tracking-[0.18em] text-[var(--color-ink-3)] sm:inline">
               Portfolio · Project 02
             </span>
-            <a
-              href="#console"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-btn)] px-3.5 py-1.5 font-sans text-[0.82rem] font-medium text-white transition-all hover:bg-[var(--color-btn-hover)]"
-            >
-              Run an assessment
-              <ArrowRight size={13} />
-            </a>
           </div>
         </div>
       </header>
@@ -352,7 +345,34 @@ export default function Home() {
           </Reveal>
         </section>
 
-        {/* ── 5. CONSOLE ── */}
+        {/* ── 5. SCOPE & ASSUMPTIONS ── */}
+        <section id="scope" className="mt-24 scroll-mt-20">
+          <Reveal>
+            <p className="kicker text-[var(--color-accent)]">Scope &amp; assumptions</p>
+            <h2 className="mt-4 font-display text-[2rem] font-semibold leading-tight tracking-[-0.01em] sm:text-[2.4rem]">
+              How I scoped this build
+            </h2>
+            <p className="mt-4 max-w-[58rem] text-[1rem] leading-relaxed text-[var(--color-ink-2)]">
+              This is a personal case study, not a production system, so I made deliberate scoping
+              choices — and I&apos;d rather state them than hide them.
+            </p>
+          </Reveal>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {SCOPE.map((b, i) => (
+              <Reveal key={b.label} delay={i * 0.05}>
+                <div className="h-full rounded-2xl border border-[var(--color-line)] bg-[var(--color-panel)]/60 p-5 sm:p-6">
+                  <p className="font-mono text-[0.66rem] font-medium uppercase tracking-[0.16em] text-[var(--color-accent)]">
+                    {b.label}
+                  </p>
+                  <p className="mt-2.5 text-[0.9rem] leading-relaxed text-[var(--color-ink-2)]">{b.body}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        {/* ── 6. CONSOLE ── */}
         <section id="console" className="mt-24 scroll-mt-20">
           <Reveal>
             <p className="kicker text-[var(--color-accent)]">Live console</p>
@@ -364,8 +384,14 @@ export default function Home() {
           <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_360px]">
             {/* picker */}
             <Reveal className="order-2 lg:order-1">
-              <div className="panel rounded-2xl p-5 sm:p-6">
-                <label htmlFor="supplier" className="kicker text-[var(--color-ink-3)]">
+              <div className="relative overflow-hidden rounded-2xl border border-[var(--color-accent)]/25 bg-[var(--color-panel)]/85 p-5 shadow-[0_18px_60px_-30px_rgba(79,140,255,0.55)] sm:p-6">
+                {/* subtle accent sheen so the live console reads as the alive, interactive part */}
+                <div
+                  className="pointer-events-none absolute inset-x-0 -top-px h-28"
+                  aria-hidden
+                  style={{ background: "linear-gradient(180deg, rgba(79,140,255,0.10), rgba(79,140,255,0))" }}
+                />
+                <label htmlFor="supplier" className="kicker relative text-[var(--color-accent)]">
                   Select a supplier to assess
                 </label>
                 <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -390,14 +416,18 @@ export default function Home() {
                   <button
                     onClick={onRun}
                     disabled={loading || !selected}
-                    className="group inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--color-btn)] px-6 py-3 font-sans text-[0.92rem] font-medium text-white transition-all hover:bg-[var(--color-btn-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="group relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--color-btn)] px-6 py-3 font-sans text-[0.92rem] font-medium text-white shadow-[0_8px_24px_-6px_rgba(79,140,255,0.6)] transition-all hover:bg-[var(--color-btn-hover)] hover:shadow-[0_12px_30px_-6px_rgba(79,140,255,0.8)] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
                   >
                     {loading ? "Running…" : "Run Assessment"}
                     {!loading && <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />}
                   </button>
                 </div>
 
-                <label className="mt-4 inline-flex cursor-pointer select-none items-center gap-2.5 text-[0.82rem] text-[var(--color-ink-2)]">
+                <label
+                  className={`relative mt-4 inline-flex cursor-pointer select-none items-center gap-2.5 text-[0.82rem] font-medium transition-colors ${
+                    fresh ? "text-[var(--color-accent-bright)]" : "text-[var(--color-ink-2)]"
+                  }`}
+                >
                   <input
                     type="checkbox"
                     checked={fresh}
@@ -406,7 +436,7 @@ export default function Home() {
                     className="h-4 w-4 cursor-pointer rounded border-[var(--color-line-strong)] bg-[var(--color-surface)] accent-[var(--color-accent)]"
                   />
                   Force fresh research
-                  <span className="text-[var(--color-ink-3)]">— bypass cache and re-run live (2–3 min)</span>
+                  <span className="font-normal text-[var(--color-ink-3)]">— bypass cache and re-run live (2–3 min)</span>
                 </label>
 
                 {loadError && <p className="mt-4 font-mono text-[0.8rem] text-[var(--color-crit)]">{loadError}</p>}
@@ -444,37 +474,10 @@ export default function Home() {
           )}
         </section>
 
-        {/* ── 6. BRIEF ── */}
+        {/* ── 7. BRIEF ── */}
         {result && !loading && (
           <Brief result={result} brief={brief} notice={notice} />
         )}
-
-        {/* ── 7. SCOPE & ASSUMPTIONS ── */}
-        <section id="scope" className="mt-28 scroll-mt-20">
-          <Reveal>
-            <p className="kicker text-[var(--color-accent)]">Scope &amp; assumptions</p>
-            <h2 className="mt-4 font-display text-[2rem] font-semibold leading-tight tracking-[-0.01em] sm:text-[2.4rem]">
-              How I scoped this build
-            </h2>
-            <p className="mt-4 max-w-[58rem] text-[1rem] leading-relaxed text-[var(--color-ink-2)]">
-              This is a personal case study, not a production system, so I made deliberate scoping
-              choices — and I&apos;d rather state them than hide them.
-            </p>
-          </Reveal>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {SCOPE.map((b, i) => (
-              <Reveal key={b.label} delay={i * 0.05}>
-                <div className="h-full rounded-2xl border border-[var(--color-line)] bg-[var(--color-panel)]/60 p-5 sm:p-6">
-                  <p className="font-mono text-[0.66rem] font-medium uppercase tracking-[0.16em] text-[var(--color-accent)]">
-                    {b.label}
-                  </p>
-                  <p className="mt-2.5 text-[0.9rem] leading-relaxed text-[var(--color-ink-2)]">{b.body}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </section>
 
         {/* ── Footer ── */}
         <footer className="mt-28 border-t border-[var(--color-line)] pt-7">
@@ -564,7 +567,7 @@ function CaseFile({ row }: { row: SupplierRow }) {
       <p className="mt-3 text-[0.88rem] leading-relaxed text-[var(--color-ink-2)]">{row.description}</p>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <div className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-3">
+        <div className="rounded-lg border p-3" style={{ borderColor: sev.ring, background: sev.soft }}>
           <div className="font-display text-xl font-semibold tabular-nums" style={{ color: sev.color }}>
             {row.concentration_score.toFixed(1)}
           </div>
