@@ -55,11 +55,46 @@ export function formatDate(iso: string): string {
   }
 }
 
-// The four case-study suppliers that have a contract document on file.
+// The four — and only four — case-study suppliers that have a contract document
+// on file. The remaining 21 suppliers in the dataset have no contract, by design.
 export const CONTRACT_IDS = new Set(["SUP-001", "SUP-002", "SUP-003", "SUP-004"]);
-export const REFERENCE_CONTRACTS: { id: string; name: string }[] = [
-  { id: "SUP-001", name: "Rheinkomp" },
-  { id: "SUP-002", name: "Zhejiang Scroll" },
-  { id: "SUP-003", name: "Milano Controls" },
-  { id: "SUP-004", name: "AlpenHX" },
+
+// Real supplier metadata (name/country/category come straight from the dataset);
+// `note` describes what each contract demonstrates about the analysis layer.
+export type ContractEntry = {
+  id: string;
+  name: string;
+  country: string;
+  category: string;
+  note: string;
+};
+export const CONTRACT_LIBRARY: ContractEntry[] = [
+  {
+    id: "SUP-001",
+    name: "Rheinkomp Compressors",
+    country: "Germany",
+    category: "compressors",
+    note: "A single-source trap — narrow force majeure, exclusivity lock-in, no late-delivery penalty.",
+  },
+  {
+    id: "SUP-002",
+    name: "Zhejiang Scroll Tech",
+    country: "China",
+    category: "compressors",
+    note: "A dual-source-friendly deal — explicit right to qualify alternative suppliers.",
+  },
+  {
+    id: "SUP-003",
+    name: "Milano Controls Srl",
+    country: "Italy",
+    category: "controls",
+    note: "A buyer-protective contract — broad force majeure and a business-continuity-plan obligation.",
+  },
+  {
+    id: "SUP-004",
+    name: "AlpenHX GmbH",
+    country: "Germany",
+    category: "heat_exchangers",
+    note: "A neutral market-standard baseline for comparison.",
+  },
 ];

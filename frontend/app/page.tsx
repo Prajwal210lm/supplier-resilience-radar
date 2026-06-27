@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   getClauseSummary,
@@ -11,7 +12,7 @@ import {
 } from "@/lib/api";
 import {
   CONTRACT_IDS,
-  REFERENCE_CONTRACTS,
+  CONTRACT_LIBRARY,
   formatDate,
   hostname,
   isHttp,
@@ -269,30 +270,65 @@ export default function Home() {
           <div className="mt-9">
             <Architecture />
           </div>
+        </section>
 
-          {/* reference contracts */}
-          <Reveal delay={0.1}>
-            <div className="mt-7 flex flex-wrap items-center gap-x-2 gap-y-2 text-[0.9rem] leading-relaxed text-[var(--color-ink-2)]">
-              <span>
-                The four supplier contracts I wrote for this case study — the other suppliers have no
-                contract on file, which the tool surfaces honestly:
-              </span>
-              {REFERENCE_CONTRACTS.map((c) => (
+        {/* ── 4. CONTRACTS ── */}
+        <section id="contracts" className="mt-24 scroll-mt-20">
+          <Reveal>
+            <p className="kicker text-[var(--color-accent)]">Contract library</p>
+            <h2 className="mt-4 font-display text-[2rem] font-semibold leading-tight tracking-[-0.01em] sm:text-[2.4rem]">
+              The contracts I wrote
+            </h2>
+            <p className="mt-4 max-w-[58rem] text-[1rem] leading-relaxed text-[var(--color-ink-2)]">
+              I wrote four representative supplier contracts spanning the risk spectrum — from a
+              single-source trap to a buyer-protective deal — to demonstrate the contract-retrieval
+              and analysis layer. The remaining suppliers in the dataset have no contract on file,
+              which the tool surfaces honestly rather than inventing terms.
+            </p>
+          </Reveal>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {CONTRACT_LIBRARY.map((c, i) => (
+              <Reveal key={c.id} delay={i * 0.05}>
                 <a
-                  key={c.id}
                   href={`/contract/${c.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="cite-link"
+                  className="group relative block h-full overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-panel)]/70 p-5 transition-colors hover:border-[var(--color-accent)]/45 sm:p-6"
                 >
-                  {c.name} ({c.id})
+                  <span className="absolute left-0 top-0 h-full w-[3px] bg-transparent transition-colors group-hover:bg-[var(--color-accent)]/70" />
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[0.72rem] text-[var(--color-accent)]">{c.id}</span>
+                    <Doc size={15} className="text-[var(--color-ink-3)] transition-colors group-hover:text-[var(--color-accent-bright)]" />
+                  </div>
+                  <h3 className="mt-2.5 font-display text-[1.3rem] font-semibold leading-tight text-[var(--color-ink)]">{c.name}</h3>
+                  <p className="mt-1 font-mono text-[0.72rem] uppercase tracking-[0.1em] text-[var(--color-ink-3)]">
+                    {c.country} · {c.category.replace(/_/g, " ")}
+                  </p>
+                  <p className="mt-3 text-[0.88rem] leading-relaxed text-[var(--color-ink-2)]">{c.note}</p>
+                  <span className="mt-4 inline-flex items-center gap-1.5 text-[0.82rem] font-medium text-[var(--color-accent-bright)]">
+                    Read the contract
+                    <ArrowUpRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+                  </span>
                 </a>
-              ))}
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal delay={0.1}>
+            <div className="mt-6">
+              <Link
+                href="/contracts"
+                className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-line-strong)] px-5 py-2.5 font-sans text-[0.88rem] font-medium text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-accent)]/50 hover:text-[var(--color-ink)]"
+              >
+                View all contracts
+                <ArrowRight size={14} />
+              </Link>
             </div>
           </Reveal>
         </section>
 
-        {/* ── 4. CONSOLE ── */}
+        {/* ── 5. CONSOLE ── */}
         <section id="console" className="mt-24 scroll-mt-20">
           <Reveal>
             <p className="kicker text-[var(--color-accent)]">Live console</p>
@@ -384,7 +420,7 @@ export default function Home() {
           )}
         </section>
 
-        {/* ── 5. BRIEF ── */}
+        {/* ── 6. BRIEF ── */}
         {result && !loading && (
           <Brief result={result} brief={brief} notice={notice} />
         )}
@@ -721,7 +757,9 @@ function Brief({
                                 </a>
                                 {/* one-line gist of the clause (real summary from the API) */}
                                 {summary && (
-                                  <p className="mt-1.5 text-[0.85rem] italic leading-relaxed text-[var(--color-ink-3)]">{summary}</p>
+                                  <p className="mt-1.5 text-[0.85rem] leading-relaxed text-[var(--color-ink-3)]">
+                                    <span className="font-semibold text-[var(--color-ink-2)]">Clause {cl.num}:</span> {summary}
+                                  </p>
                                 )}
                               </div>
                             );
