@@ -38,13 +38,26 @@ export type Severity = {
   ring: string;
 };
 
-// Concentration-score severity: high score = high exposure (red), low = green.
+// Shared severity colour buckets (red / amber / green), so every threshold scale
+// below stays in sync.
+const SEV_CRITICAL: Severity = { key: "critical", label: "Critical exposure", color: "#ff5470", soft: "rgba(255,84,112,0.13)", ring: "rgba(255,84,112,0.45)" };
+const SEV_ELEVATED: Severity = { key: "elevated", label: "Elevated exposure", color: "#ffb020", soft: "rgba(255,176,32,0.13)", ring: "rgba(255,176,32,0.45)" };
+const SEV_LOW: Severity = { key: "low", label: "Contained exposure", color: "#2ee6a6", soft: "rgba(46,230,166,0.13)", ring: "rgba(46,230,166,0.45)" };
+
+// Concentration-score severity for the gauge and brief: high score = high
+// exposure (red), low = green.
 export function severity(score: number): Severity {
-  if (score >= 75)
-    return { key: "critical", label: "Critical exposure", color: "#ff5470", soft: "rgba(255,84,112,0.13)", ring: "rgba(255,84,112,0.45)" };
-  if (score >= 50)
-    return { key: "elevated", label: "Elevated exposure", color: "#ffb020", soft: "rgba(255,176,32,0.13)", ring: "rgba(255,176,32,0.45)" };
-  return { key: "low", label: "Contained exposure", color: "#2ee6a6", soft: "rgba(46,230,166,0.13)", ring: "rgba(46,230,166,0.45)" };
+  if (score >= 75) return SEV_CRITICAL;
+  if (score >= 50) return SEV_ELEVATED;
+  return SEV_LOW;
+}
+
+// The case-file score chip uses the stated product cutoffs (red >= 80, amber
+// 50-79, green < 50), independent of the gauge/brief severity() scale above.
+export function chipSeverity(score: number): Severity {
+  if (score >= 80) return SEV_CRITICAL;
+  if (score >= 50) return SEV_ELEVATED;
+  return SEV_LOW;
 }
 
 export function formatDate(iso: string): string {
@@ -74,21 +87,21 @@ export const CONTRACT_LIBRARY: ContractEntry[] = [
     name: "Rheinkomp Compressors",
     country: "Germany",
     category: "compressors",
-    note: "A single-source trap — narrow force majeure, exclusivity lock-in, no late-delivery penalty.",
+    note: "A single-source trap: narrow force majeure, exclusivity lock-in, and no late-delivery penalty.",
   },
   {
     id: "SUP-002",
     name: "Zhejiang Scroll Tech",
     country: "China",
     category: "compressors",
-    note: "A dual-source-friendly deal — explicit right to qualify alternative suppliers.",
+    note: "A dual-source-friendly deal: an explicit right to qualify alternative suppliers.",
   },
   {
     id: "SUP-003",
     name: "Milano Controls Srl",
     country: "Italy",
     category: "controls",
-    note: "A buyer-protective contract — broad force majeure and a business-continuity-plan obligation.",
+    note: "A buyer-protective contract: broad force majeure and a business-continuity-plan obligation.",
   },
   {
     id: "SUP-004",

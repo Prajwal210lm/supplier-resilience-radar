@@ -151,7 +151,7 @@ export default function ContractPage() {
               <h1 className="font-display text-xl font-semibold text-[var(--color-ink)]">Contract not available</h1>
             </div>
             <p className="mt-3 text-[0.92rem] leading-relaxed text-[var(--color-ink-2)]">
-              No contract is on file for <span className="font-mono text-[var(--color-ink)]">{id}</span> — only the four
+              No contract is on file for <span className="font-mono text-[var(--color-ink)]">{id}</span>. Only the four
               case-study suppliers (SUP-001 to SUP-004) have a contract document.
             </p>
           </div>

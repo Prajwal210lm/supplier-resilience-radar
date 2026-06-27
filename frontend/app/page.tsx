@@ -13,6 +13,7 @@ import {
 import {
   CONTRACT_IDS,
   CONTRACT_LIBRARY,
+  chipSeverity,
   formatDate,
   hostname,
   isHttp,
@@ -20,6 +21,7 @@ import {
   severity,
   splitLead,
 } from "@/lib/format";
+import { addFreshUsed, readFreshUsed } from "@/lib/fresh-guard";
 import { CountUp, Reveal } from "@/components/motion";
 import Gauge from "@/components/Gauge";
 import Architecture from "@/components/Architecture";
@@ -40,17 +42,17 @@ const SCOPE: { label: string; body: string }[] = [
   {
     label: "Contracts",
     body:
-      "I wrote 4 supplier contracts, not 25 — covering the full risk spectrum: a single-source trap (Rheinkomp), a dual-source-friendly deal (Zhejiang Scroll), a buyer-protective contract (Milano Controls), and a neutral baseline (AlpenHX). That's enough to prove the contract-retrieval and analysis layer, including a deliberate test that the system never pulls one supplier's clauses when assessing another. Writing 21 more for commodity suppliers (packaging, fasteners) would make the demo look bigger without testing anything new — and several of those wouldn't realistically have rich bilateral contracts at all. For suppliers without one, the tool reports the gap rather than inventing terms.",
+      "I wrote 4 supplier contracts, not 25. They cover the full risk spectrum: a single-source trap (Rheinkomp), a dual-source-friendly deal (Zhejiang Scroll), a buyer-protective contract (Milano Controls), and a neutral baseline (AlpenHX). That is enough to prove the contract-retrieval and analysis layer, including a deliberate test that the system never pulls one supplier's clauses when assessing another. Writing 21 more for commodity suppliers like packaging and fasteners would make the demo look bigger without testing anything new, and several of those would not realistically have detailed contracts at all. For suppliers without one, the tool reports the gap rather than inventing terms.",
   },
   {
     label: "Data",
     body:
-      "The 25 suppliers and their numbers are synthetic, engineered with a planted concentration story — a single-source German compressor supplier scoring 94/100; a copper supplier scoring 14 despite high spend, because it has a real alternative — so the scoring logic is demonstrable and defensible. The company, GCI, is fictional.",
+      "The 25 suppliers and their numbers are made up, built around a planted concentration story. A single-source German compressor supplier scores 94 out of 100, while a copper supplier scores 14 despite high spend, because it has a real alternative. That keeps the scoring logic easy to see and to defend. The company, GCI, is fictional.",
   },
   {
     label: "Live signals",
     body:
-      "Risk signals come from real, live web search, so a fresh run changes over time. That's intended, not a bug.",
+      "Risk signals come from real, live web search, so a fresh run changes over time. That is intended, not a bug.",
   },
   {
     label: "Production path",
@@ -131,6 +133,8 @@ export default function Home() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [loadingFresh, setLoadingFresh] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  // Suppliers that have already used their single live run in THIS browser.
+  const [freshUsed, setFreshUsed] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     getSuppliers()
@@ -141,10 +145,21 @@ export default function Home() {
       .catch(() => setLoadError("Could not reach the assessment service."));
   }, []);
 
+  useEffect(() => {
+    // Load the per-browser fresh-run guard after mount (kept out of the initial
+    // render so the server/first-client render match and don't trigger hydration
+    // warnings). Reading localStorage to sync external state is a valid effect use.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFreshUsed(readFreshUsed());
+  }, []);
+
+  // A fresh run is only allowed if this supplier hasn't used its one live run yet.
+  const canFresh = selected !== "" && !freshUsed.has(selected);
+
   function onRun() {
     if (!selected) return;
     setNotice(null);
-    if (fresh) {
+    if (fresh && canFresh) {
       setShowConfirm(true); // gate live runs behind the modal
       return;
     }
@@ -153,6 +168,12 @@ export default function Home() {
 
   async function assess(useFresh: boolean) {
     setShowConfirm(false);
+    if (useFresh) {
+      // Count the run the moment it is confirmed, before the request fires. A
+      // failed or validation-withheld run still consumes this supplier's single
+      // live attempt, which is what stops credit burn on repeated failures.
+      setFreshUsed(addFreshUsed(selected));
+    }
     setError(null);
     setNotice(null);
     setResult(null);
@@ -161,25 +182,25 @@ export default function Home() {
     try {
       const data = await runRiskBrief(selected, useFresh);
       // A live (fresh) run can return HTTP 200 with brief === null and a non-empty
-      // violations array — the validator correctly withholding an unverifiable
-      // claim, not a usable result. Treat that like a withheld live run: fall back
-      // to the most recent validated (cached) brief, framed calmly.
+      // violations array: the validator correctly withholding an unverifiable
+      // claim, not a usable result. Treat that like a withheld live run and fall
+      // back to the most recent validated (cached) brief, framed calmly.
       if (useFresh && data.brief === null) {
         try {
           const cached = await runRiskBrief(selected, false);
           if (cached.brief) {
             setResult(cached);
             setNotice(
-              "The live run produced a claim that failed validation, so the brief was withheld. Showing the most recent validated brief instead."
+              "The live run produced a claim that couldn't be source-verified, so the brief was withheld. Showing the most recent validated brief."
             );
           } else {
             setError(
-              "The live research run did not produce a fully validated brief this time. This can happen when a freshly retrieved claim cannot be verified — the tool withholds the brief rather than showing an unverified result. Please try again."
+              "The live research run did not produce a fully validated brief this time. This can happen when a freshly retrieved claim cannot be verified, so the tool withholds the brief rather than showing an unverified result. Please try again."
             );
           }
         } catch {
           setError(
-            "The live research run did not produce a fully validated brief this time. This can happen when a freshly retrieved claim cannot be verified — the tool withholds the brief rather than showing an unverified result. Please try again."
+            "The live research run did not produce a fully validated brief this time. This can happen when a freshly retrieved claim cannot be verified, so the tool withholds the brief rather than showing an unverified result. Please try again."
           );
         }
       } else {
@@ -191,7 +212,7 @@ export default function Home() {
         try {
           const cached = await runRiskBrief(selected, false);
           setResult(cached);
-          setNotice("Live research did not finish — showing the most recent cached brief.");
+          setNotice("Live research did not finish. Showing the most recent cached brief.");
         } catch {
           setError("The live assessment could not be completed. Please try again later.");
         }
@@ -246,11 +267,10 @@ export default function Home() {
               </Reveal>
               <Reveal delay={0.12}>
                 <p className="mt-6 max-w-[40rem] text-[1.1rem] leading-relaxed text-[var(--color-ink-2)]">
-                  I built an AI agent that assesses how exposed a manufacturer is to a single
-                  supplier in its supply chain — concentration risk, live disruption signals, and
-                  contract terms — and writes a board-ready brief where{" "}
-                  <span className="text-[var(--color-ink)]">every number is computed by tested code</span> and{" "}
-                  <span className="text-[var(--color-ink)]">every claim is traced to a source it actually retrieved</span>.
+                  I built an AI agent that measures how exposed a manufacturer is to a single supplier
+                  in its supply chain, then writes a clear, board-ready brief.{" "}
+                  <span className="text-[var(--color-ink)]">Every number is computed by tested code</span>, and{" "}
+                  <span className="text-[var(--color-ink)]">every claim is traced to a source it actually found</span>.
                 </p>
               </Reveal>
               <Reveal delay={0.18}>
@@ -287,25 +307,43 @@ export default function Home() {
               <span className="kicker text-[var(--color-ink-3)]">The problem I took</span>
             </div>
             <p className="mt-4 max-w-[58rem] text-[1.02rem] leading-relaxed text-[var(--color-ink-2)]">
-              Gulf Cooling Industries (GCI) is a fictional UAE manufacturer of industrial chillers
-              and district-cooling systems, created for this case study — it is not a real company.
-              GCI runs <span className="text-[var(--color-ink)]">AED 480M of annual spend across 25 strategic
-              suppliers</span> in its supply chain, importing critical compressors and components from
-              concentrated overseas sources. A single-source supplier failure stops the production line
-              for weeks. The exposure is known in principle but never assessed proactively, because
-              checking one supplier means cross-referencing supply-chain data, live external signals,
-              and the supplier contract — days of analyst work each.{" "}
+              Gulf Cooling Industries (GCI) is a fictional UAE manufacturer of industrial chillers and
+              district-cooling systems, created for this case study. It is not a real company. GCI spends{" "}
+              <span className="text-[var(--color-ink)]">AED 480M a year across 25 strategic suppliers</span> in
+              its supply chain, importing critical compressors and components from a few concentrated
+              overseas sources. If a single-source supplier fails, the production line stops for weeks.
+              Everyone knows the exposure exists, but nobody checks it ahead of time, because assessing
+              one supplier means cross-referencing supply-chain data, live external news, and the
+              contract. That is days of analyst work each time.{" "}
               <span className="text-[var(--color-ink)]">I built this tool to produce that assessment on demand.</span>
             </p>
           </div>
         </Reveal>
 
-        {/* ── 3. ARCHITECTURE ── */}
+        {/* ── 3. HOW I APPROACHED IT (plain language, before any technical detail) ── */}
+        <section id="approach" className="mt-24 scroll-mt-20">
+          <Reveal>
+            <p className="kicker text-[var(--color-accent)]">How I approached it</p>
+            <h2 className="mt-4 max-w-[40rem] font-display text-[2rem] font-semibold leading-tight tracking-[-0.01em] sm:text-[2.4rem]">
+              In plain terms
+            </h2>
+            <p className="mt-5 max-w-[54rem] text-[1.05rem] leading-relaxed text-[var(--color-ink-2)]">
+              To assess one supplier you normally cross-check three things: how much the business
+              depends on them, what is happening to them right now in the news, and what the contract
+              actually allows. I taught an AI agent to do all three and write the answer up the way an
+              analyst would. The strict rule is simple: it can only state a number the code calculated,
+              and it can only cite a fact it genuinely found. If it cannot back something up, the system
+              refuses to show it.
+            </p>
+          </Reveal>
+        </section>
+
+        {/* ── 4. HOW I DESIGNED IT (architecture) ── */}
         <section id="how" className="mt-24 scroll-mt-20">
           <Reveal>
             <p className="kicker text-[var(--color-accent)]">How I designed it</p>
-            <h2 className="mt-4 max-w-[36rem] font-display text-[2rem] font-semibold leading-tight tracking-[-0.01em] sm:text-[2.4rem]">
-              Four stages. The judgement is the agent&apos;s; the numbers are not.
+            <h2 className="mt-4 max-w-[40rem] font-display text-[2rem] font-semibold leading-tight tracking-[-0.01em] sm:text-[2.4rem]">
+              Four stages, from raw data to a checked brief.
             </h2>
           </Reveal>
           <div className="mt-9">
@@ -313,7 +351,34 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── 4. CONTRACTS ── */}
+        {/* ── 5. SCOPE & ASSUMPTIONS ── */}
+        <section id="scope" className="mt-24 scroll-mt-20">
+          <Reveal>
+            <p className="kicker text-[var(--color-accent)]">Scope &amp; assumptions</p>
+            <h2 className="mt-4 font-display text-[2rem] font-semibold leading-tight tracking-[-0.01em] sm:text-[2.4rem]">
+              How I scoped this build
+            </h2>
+            <p className="mt-4 max-w-[58rem] text-[1rem] leading-relaxed text-[var(--color-ink-2)]">
+              This is a personal case study, not a production system, so I made deliberate scoping
+              choices, and I&apos;d rather state them than hide them.
+            </p>
+          </Reveal>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {SCOPE.map((b, i) => (
+              <Reveal key={b.label} delay={i * 0.05}>
+                <div className="h-full rounded-2xl border border-[var(--color-line)] bg-[var(--color-panel)]/60 p-5 sm:p-6">
+                  <p className="font-mono text-[0.66rem] font-medium uppercase tracking-[0.16em] text-[var(--color-accent)]">
+                    {b.label}
+                  </p>
+                  <p className="mt-2.5 text-[0.9rem] leading-relaxed text-[var(--color-ink-2)]">{b.body}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        {/* ── 6. CONTRACTS ── */}
         <section id="contracts" className="mt-24 scroll-mt-20">
           <Reveal>
             <p className="kicker text-[var(--color-accent)]">Contract library</p>
@@ -321,10 +386,10 @@ export default function Home() {
               The contracts I wrote
             </h2>
             <p className="mt-4 max-w-[58rem] text-[1rem] leading-relaxed text-[var(--color-ink-2)]">
-              I wrote four representative supplier contracts spanning the risk spectrum — from a
-              single-source trap to a buyer-protective deal — to demonstrate the contract-retrieval
-              and analysis layer. The remaining suppliers in the dataset have no contract on file,
-              which the tool surfaces honestly rather than inventing terms.
+              I wrote four representative supplier contracts that span the risk spectrum, from a
+              single-source trap to a buyer-protective deal, to show the contract-retrieval and
+              analysis layer working. The other suppliers in the dataset have no contract on file,
+              which the tool reports honestly rather than inventing terms.
             </p>
           </Reveal>
 
@@ -369,34 +434,7 @@ export default function Home() {
           </Reveal>
         </section>
 
-        {/* ── 5. SCOPE & ASSUMPTIONS ── */}
-        <section id="scope" className="mt-24 scroll-mt-20">
-          <Reveal>
-            <p className="kicker text-[var(--color-accent)]">Scope &amp; assumptions</p>
-            <h2 className="mt-4 font-display text-[2rem] font-semibold leading-tight tracking-[-0.01em] sm:text-[2.4rem]">
-              How I scoped this build
-            </h2>
-            <p className="mt-4 max-w-[58rem] text-[1rem] leading-relaxed text-[var(--color-ink-2)]">
-              This is a personal case study, not a production system, so I made deliberate scoping
-              choices — and I&apos;d rather state them than hide them.
-            </p>
-          </Reveal>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {SCOPE.map((b, i) => (
-              <Reveal key={b.label} delay={i * 0.05}>
-                <div className="h-full rounded-2xl border border-[var(--color-line)] bg-[var(--color-panel)]/60 p-5 sm:p-6">
-                  <p className="font-mono text-[0.66rem] font-medium uppercase tracking-[0.16em] text-[var(--color-accent)]">
-                    {b.label}
-                  </p>
-                  <p className="mt-2.5 text-[0.9rem] leading-relaxed text-[var(--color-ink-2)]">{b.body}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </section>
-
-        {/* ── 6. CONSOLE ── */}
+        {/* ── 7. CONSOLE ── */}
         <section id="console" className="mt-24 scroll-mt-20">
           <Reveal>
             <p className="kicker text-[var(--color-accent)]">Live console</p>
@@ -408,12 +446,15 @@ export default function Home() {
           <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_360px]">
             {/* picker */}
             <Reveal className="order-2 lg:order-1">
-              <div className="relative overflow-hidden rounded-2xl border border-[var(--color-accent)]/25 bg-[var(--color-panel)]/85 p-5 shadow-[0_18px_60px_-30px_rgba(79,140,255,0.55)] sm:p-6">
-                {/* subtle accent sheen so the live console reads as the alive, interactive part */}
+              <div
+                className="relative overflow-hidden rounded-2xl border border-[var(--color-accent)]/45 p-5 shadow-[0_24px_70px_-22px_rgba(79,140,255,0.6)] sm:p-6"
+                style={{ background: "radial-gradient(130% 150% at 0% 0%, rgba(79,140,255,0.16), rgba(14,20,38,0.94) 56%)" }}
+              >
+                {/* glowing accent edge so the live console clearly reads as the alive, interactive part */}
                 <div
-                  className="pointer-events-none absolute inset-x-0 -top-px h-28"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px"
                   aria-hidden
-                  style={{ background: "linear-gradient(180deg, rgba(79,140,255,0.10), rgba(79,140,255,0))" }}
+                  style={{ background: "linear-gradient(90deg, transparent, rgba(122,166,255,0.8), transparent)" }}
                 />
                 <label htmlFor="supplier" className="kicker relative text-[var(--color-accent)]">
                   Select a supplier to assess
@@ -440,7 +481,7 @@ export default function Home() {
                   <button
                     onClick={onRun}
                     disabled={loading || !selected}
-                    className="group relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--color-btn)] px-6 py-3 font-sans text-[0.92rem] font-medium text-white shadow-[0_8px_24px_-6px_rgba(79,140,255,0.6)] transition-all hover:bg-[var(--color-btn-hover)] hover:shadow-[0_12px_30px_-6px_rgba(79,140,255,0.8)] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                    className="group relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--color-btn)] px-6 py-3 font-sans text-[0.92rem] font-medium text-white shadow-[0_10px_28px_-6px_rgba(79,140,255,0.7)] transition-all hover:-translate-y-0.5 hover:bg-[var(--color-btn-hover)] hover:shadow-[0_16px_36px_-6px_rgba(79,140,255,0.9)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0"
                   >
                     {loading ? "Running…" : "Run Assessment"}
                     {!loading && <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />}
@@ -448,22 +489,30 @@ export default function Home() {
                 </div>
 
                 <label
-                  className={`relative mt-4 inline-flex cursor-pointer select-none items-center gap-2.5 text-[0.82rem] font-medium transition-colors ${
-                    fresh ? "text-[var(--color-accent-bright)]" : "text-[var(--color-ink-2)]"
+                  className={`relative mt-4 inline-flex select-none items-center gap-2.5 rounded-lg border px-3 py-2 text-[0.84rem] font-medium transition-all ${
+                    !canFresh
+                      ? "cursor-not-allowed border-[var(--color-line)] text-[var(--color-ink-3)]"
+                      : fresh
+                        ? "cursor-pointer border-[var(--color-accent)]/60 bg-[var(--color-accent-soft)] text-[var(--color-accent-bright)] shadow-[0_0_20px_-6px_rgba(79,140,255,0.55)]"
+                        : "cursor-pointer border-[var(--color-line-strong)] text-[var(--color-ink-2)] hover:border-[var(--color-accent)]/40"
                   }`}
                 >
                   <input
                     type="checkbox"
-                    checked={fresh}
+                    checked={fresh && canFresh}
                     onChange={(e) => setFresh(e.target.checked)}
-                    disabled={loading}
-                    className="h-4 w-4 cursor-pointer rounded border-[var(--color-line-strong)] bg-[var(--color-surface)] accent-[var(--color-accent)]"
+                    disabled={loading || !canFresh}
+                    className="h-4 w-4 cursor-pointer rounded border-[var(--color-line-strong)] bg-[var(--color-surface)] accent-[var(--color-accent)] disabled:cursor-not-allowed"
                   />
                   Force fresh research
-                  <span className="font-normal text-[var(--color-ink-3)]">— bypass cache and re-run live (2–3 min)</span>
                 </label>
+                <p className="relative mt-1.5 text-[0.75rem] leading-snug text-[var(--color-ink-3)]">
+                  {canFresh
+                    ? "Bypass the cache and run live web research (2–3 min)."
+                    : "One live run per supplier, already used. Showing the cached brief."}
+                </p>
 
-                {loadError && <p className="mt-4 font-mono text-[0.8rem] text-[var(--color-crit)]">{loadError}</p>}
+                {loadError && <p className="relative mt-4 font-mono text-[0.8rem] text-[var(--color-crit)]">{loadError}</p>}
               </div>
             </Reveal>
 
@@ -498,7 +547,7 @@ export default function Home() {
           )}
         </section>
 
-        {/* ── 7. BRIEF ── */}
+        {/* ── 8. BRIEF ── */}
         {result && !loading && (
           <Brief result={result} brief={brief} notice={notice} />
         )}
@@ -508,7 +557,7 @@ export default function Home() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-[44rem] text-[0.82rem] leading-relaxed text-[var(--color-ink-3)]">
               Project 02 of a four-project AI supply-chain portfolio I&apos;m building. Each one takes a
-              real supply-chain problem and ships an end-to-end tool — tested code for the numbers, an
+              real supply-chain problem and ships an end-to-end tool: tested code for the numbers, an
               agent for the judgement, and a check that keeps the output honest.
             </p>
             <span className="font-mono text-[0.7rem] uppercase tracking-[0.16em] text-[var(--color-ink-3)]">
@@ -526,10 +575,9 @@ export default function Home() {
         title="Run live research?"
         confirmLabel="Run live research"
       >
-        This fetches current news, country and port-risk signals, and analyzes the
-        supplier&apos;s contract in real time. It usually takes{" "}
-        <span className="font-semibold text-[var(--color-ink)]">2–3 minutes</span> and replaces the cached
-        brief shown by default.
+        This runs live web research and can take{" "}
+        <span className="font-semibold text-[var(--color-ink)]">2–3 minutes</span>. You get one live run per
+        supplier, so the result replaces the cached brief. Continue?
       </ConfirmDialog>
     </div>
   );
@@ -570,7 +618,8 @@ function HeroInstrument() {
  *  Case-file panel (slides in on select)
  * ------------------------------------------------------------------ */
 function CaseFile({ row }: { row: SupplierRow }) {
-  const sev = severity(row.concentration_score);
+  // Case-file score chip uses the product cutoffs: red >= 80, amber 50-79, green < 50.
+  const sev = chipSeverity(row.concentration_score);
   const hasContract = CONTRACT_IDS.has(row.supplier_id);
   return (
     <motion.div
@@ -591,29 +640,32 @@ function CaseFile({ row }: { row: SupplierRow }) {
       <p className="mt-3 text-[0.88rem] leading-relaxed text-[var(--color-ink-2)]">{row.description}</p>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <div className="rounded-lg border p-3" style={{ borderColor: sev.ring, background: sev.soft }}>
+        <div
+          className="rounded-lg border p-3"
+          style={{ borderColor: sev.ring, background: sev.soft, boxShadow: `0 0 22px -8px ${sev.color}` }}
+        >
           <div className="font-display text-xl font-semibold tabular-nums" style={{ color: sev.color }}>
             {row.concentration_score.toFixed(1)}
           </div>
-          <div className="mt-0.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-[var(--color-ink-3)]">Concentration</div>
+          <div className="mt-0.5 font-mono text-[0.6rem] uppercase tracking-[0.12em]" style={{ color: sev.color }}>Concentration</div>
         </div>
-        <div className="rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-3">
-          <div className="font-display text-xl font-semibold tabular-nums text-[var(--color-ink)]">
+        <div className="rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-accent-soft)] p-3">
+          <div className="font-display text-xl font-semibold tabular-nums text-[var(--color-accent-bright)]">
             {(row.spend_share * 100).toFixed(1)}%
           </div>
-          <div className="mt-0.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-[var(--color-ink-3)]">Spend share</div>
+          <div className="mt-0.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-[var(--color-accent)]">Spend share</div>
         </div>
       </div>
 
       {/* plain-English captions so a non-expert understands the two figures */}
       <dl className="mt-3 space-y-1.5">
         <div className="text-[0.72rem] leading-snug text-[var(--color-ink-3)]">
-          <dt className="inline font-medium text-[var(--color-ink-2)]">Concentration —</dt>{" "}
-          <dd className="inline">0–100 risk score: how exposed GCI is to this one supplier (higher = more dangerous).</dd>
+          <dt className="inline font-medium text-[var(--color-ink-2)]">Concentration:</dt>{" "}
+          <dd className="inline">a 0 to 100 risk score for how exposed GCI is to this one supplier (higher is more dangerous).</dd>
         </div>
         <div className="text-[0.72rem] leading-snug text-[var(--color-ink-3)]">
-          <dt className="inline font-medium text-[var(--color-ink-2)]">Spend share —</dt>{" "}
-          <dd className="inline">Share of GCI&apos;s total annual procurement spend that goes to this supplier.</dd>
+          <dt className="inline font-medium text-[var(--color-ink-2)]">Spend share:</dt>{" "}
+          <dd className="inline">the share of GCI&apos;s total annual procurement spend that goes to this supplier.</dd>
         </div>
       </dl>
 
@@ -971,8 +1023,8 @@ function NoContractPanel() {
         <p className="mt-1.5 text-[0.92rem] leading-relaxed text-[var(--color-ink-2)]">
           No contract on file for this supplier. GCI&apos;s contract corpus covers its four highest-risk
           strategic suppliers (SUP-001 to SUP-004). For suppliers outside that set, the tool reports this
-          as a known gap rather than inventing contract terms — the same discipline applied to every other
-          claim in this brief.
+          as a known gap rather than inventing contract terms. It is the same discipline applied to every
+          other claim in this brief.
         </p>
       </div>
     </div>

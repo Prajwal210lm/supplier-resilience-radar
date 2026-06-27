@@ -19,9 +19,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Supplier Resilience Radar — AI supply-chain risk intelligence",
+  title: "Supplier Resilience Radar · AI supply-chain risk intelligence",
   description:
-    "An AI agent that assesses a manufacturer's exposure to a single supplier — concentration risk, live disruption signals, and contract terms — and writes a board-ready brief. A portfolio project by Prajwal.",
+    "An AI agent that measures a manufacturer's exposure to a single supplier, covering concentration risk, live disruption signals, and contract terms, then writes a board-ready brief. A portfolio project by Prajwal.",
 };
 
 export default function RootLayout({

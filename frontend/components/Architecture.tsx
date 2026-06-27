@@ -6,22 +6,22 @@ const STAGES: { n: string; name: string; line: string }[] = [
   {
     n: "01",
     name: "Profile",
-    line: "Deterministic. Tested Python computes every number — spend share, single-source count, line-down gap, the concentration score.",
+    line: "Tested code calculates every number: how much GCI spends here, how many parts have no backup supplier, and how long the line would stop if this supplier failed.",
   },
   {
     n: "02",
     name: "Research",
-    line: "Agentic. A ReAct loop runs live web search and retrieves the supplier's own contract across company, country, logistics and contract risk.",
+    line: "The AI agent searches the live web and reads the supplier's own contract, covering the company, its country, its shipping route, and the contract terms.",
   },
   {
     n: "03",
     name: "Synthesize",
-    line: "Writes the board-ready brief — five sections, every figure rendered from the profile, never re-guessed by the model.",
+    line: "The agent writes the brief in five short sections. Every figure is pulled straight from the calculations, never re-guessed by the model.",
   },
   {
     n: "04",
     name: "Validate",
-    line: "Rejects the brief if any number can't be reproduced or any cited source wasn't actually retrieved.",
+    line: "A final check throws the brief out if any number cannot be reproduced, or any cited source was not actually found.",
   },
 ];
 
@@ -74,8 +74,8 @@ export default function Architecture() {
       >
         <p className="font-display text-[1.05rem] font-medium leading-snug text-[var(--color-ink)] sm:text-[1.2rem]">
           Every number comes from tested code.{" "}
-          <span className="text-[var(--color-accent-bright)]">Every claim is checked against what the agent actually retrieved</span>{" "}
-          — a figure it can&apos;t reproduce or a source it never fetched is rejected before the brief renders.
+          <span className="text-[var(--color-accent-bright)]">Every claim is checked against what the agent actually found.</span>{" "}
+          If it cannot reproduce a number, or point to a real source, the brief is withheld.
         </p>
       </motion.div>
     </div>

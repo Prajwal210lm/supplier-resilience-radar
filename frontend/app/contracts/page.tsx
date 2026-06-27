@@ -4,7 +4,7 @@ import { CONTRACT_LIBRARY } from "@/lib/format";
 import { ArrowRight, Doc } from "@/components/icons";
 
 export const metadata: Metadata = {
-  title: "Contract library — Supplier Resilience Radar",
+  title: "Contract library · Supplier Resilience Radar",
   description:
     "The four case-study supplier contracts behind the tool's contract-retrieval and analysis layer.",
 };
@@ -34,10 +34,10 @@ export default function ContractsIndex() {
             The contracts I wrote
           </h1>
           <p className="mt-5 max-w-[46rem] text-[1.05rem] leading-relaxed text-[var(--color-ink-2)]">
-            Four representative supplier contracts spanning the risk spectrum — from a single-source
-            trap to a buyer-protective deal — written to demonstrate the tool&apos;s contract-retrieval
-            and analysis layer. These are the only four contracts in the case study; the remaining
-            suppliers in the dataset have none on file, which the tool surfaces honestly rather than
+            Four representative supplier contracts that span the risk spectrum, from a single-source
+            trap to a buyer-protective deal, written to show the tool&apos;s contract-retrieval and
+            analysis layer working. These are the only four contracts in the case study. The other
+            suppliers in the dataset have none on file, which the tool reports honestly rather than
             inventing terms.
           </p>
         </section>
