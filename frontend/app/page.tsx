@@ -160,7 +160,31 @@ export default function Home() {
     setLoading(true);
     try {
       const data = await runRiskBrief(selected, useFresh);
-      setResult(data);
+      // A live (fresh) run can return HTTP 200 with brief === null and a non-empty
+      // violations array — the validator correctly withholding an unverifiable
+      // claim, not a usable result. Treat that like a withheld live run: fall back
+      // to the most recent validated (cached) brief, framed calmly.
+      if (useFresh && data.brief === null) {
+        try {
+          const cached = await runRiskBrief(selected, false);
+          if (cached.brief) {
+            setResult(cached);
+            setNotice(
+              "The live run produced a claim that failed validation, so the brief was withheld. Showing the most recent validated brief instead."
+            );
+          } else {
+            setError(
+              "The live research run did not produce a fully validated brief this time. This can happen when a freshly retrieved claim cannot be verified — the tool withholds the brief rather than showing an unverified result. Please try again."
+            );
+          }
+        } catch {
+          setError(
+            "The live research run did not produce a fully validated brief this time. This can happen when a freshly retrieved claim cannot be verified — the tool withholds the brief rather than showing an unverified result. Please try again."
+          );
+        }
+      } else {
+        setResult(data);
+      }
     } catch {
       if (useFresh) {
         // live run failed (timeout / resource limit) — fall back to the cached brief
