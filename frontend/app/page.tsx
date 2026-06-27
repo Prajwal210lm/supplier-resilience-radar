@@ -35,6 +35,30 @@ import {
   Shield,
 } from "@/components/icons";
 
+// Honest design-rationale blocks for the "Scope & assumptions" section.
+const SCOPE: { label: string; body: string }[] = [
+  {
+    label: "Contracts",
+    body:
+      "I wrote 4 supplier contracts, not 25 — covering the full risk spectrum: a single-source trap (Rheinkomp), a dual-source-friendly deal (Zhejiang Scroll), a buyer-protective contract (Milano Controls), and a neutral baseline (AlpenHX). That's enough to prove the contract-retrieval and analysis layer, including a deliberate test that the system never pulls one supplier's clauses when assessing another. Writing 21 more for commodity suppliers (packaging, fasteners) would make the demo look bigger without testing anything new — and several of those wouldn't realistically have rich bilateral contracts at all. For suppliers without one, the tool reports the gap rather than inventing terms.",
+  },
+  {
+    label: "Data",
+    body:
+      "The 25 suppliers and their numbers are synthetic, engineered with a planted concentration story — a single-source German compressor supplier scoring 94/100; a copper supplier scoring 14 despite high spend, because it has a real alternative — so the scoring logic is demonstrable and defensible. The company, GCI, is fictional.",
+  },
+  {
+    label: "Live signals",
+    body:
+      "Risk signals come from real, live web search, so a fresh run changes over time. That's intended, not a bug.",
+  },
+  {
+    label: "Production path",
+    body:
+      "A production version would plug in premium risk feeds (credit ratings, financial-distress signals), scheduled monitoring instead of on-demand runs, and a human review step before any recommendation. The architecture already leaves clean seams for these.",
+  },
+];
+
 /* ------------------------------------------------------------------ *
  *  Small shared pieces
  * ------------------------------------------------------------------ */
@@ -425,6 +449,33 @@ export default function Home() {
           <Brief result={result} brief={brief} notice={notice} />
         )}
 
+        {/* ── 7. SCOPE & ASSUMPTIONS ── */}
+        <section id="scope" className="mt-28 scroll-mt-20">
+          <Reveal>
+            <p className="kicker text-[var(--color-accent)]">Scope &amp; assumptions</p>
+            <h2 className="mt-4 font-display text-[2rem] font-semibold leading-tight tracking-[-0.01em] sm:text-[2.4rem]">
+              How I scoped this build
+            </h2>
+            <p className="mt-4 max-w-[58rem] text-[1rem] leading-relaxed text-[var(--color-ink-2)]">
+              This is a personal case study, not a production system, so I made deliberate scoping
+              choices — and I&apos;d rather state them than hide them.
+            </p>
+          </Reveal>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {SCOPE.map((b, i) => (
+              <Reveal key={b.label} delay={i * 0.05}>
+                <div className="h-full rounded-2xl border border-[var(--color-line)] bg-[var(--color-panel)]/60 p-5 sm:p-6">
+                  <p className="font-mono text-[0.66rem] font-medium uppercase tracking-[0.16em] text-[var(--color-accent)]">
+                    {b.label}
+                  </p>
+                  <p className="mt-2.5 text-[0.9rem] leading-relaxed text-[var(--color-ink-2)]">{b.body}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
         {/* ── Footer ── */}
         <footer className="mt-28 border-t border-[var(--color-line)] pt-7">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -726,10 +777,12 @@ function Brief({
           {/* 03 contract implications */}
           <div className="pt-12">
             <SectionShell n="03" title="Contract Implications" id="b-contract">
+              {!CONTRACT_IDS.has(result.supplier_id) ? (
+                <NoContractPanel />
+              ) : brief.contract_implications.length === 0 ? (
+                <EmptyNote text="No contract terms in this supplier's agreement bear materially on the risks above." />
+              ) : (
               <div className="grid gap-3">
-                {brief.contract_implications.length === 0 && (
-                  <EmptyNote text="No contract implications were identified." />
-                )}
                 {brief.contract_implications.map((c, i) => {
                   const clauses = c.citations.map(parseClause).filter(Boolean) as { sid: string; num: number }[];
                   const others = c.citations.filter((cc) => !parseClause(cc));
@@ -777,6 +830,7 @@ function Brief({
                   );
                 })}
               </div>
+              )}
             </SectionShell>
           </div>
 
@@ -867,8 +921,35 @@ function Stat({ label, value, color }: { label: string; value: React.ReactNode; 
   );
 }
 
+// A calm "this is intentional, not broken" placeholder for a section that came
+// back sparse for a lower-profile supplier.
 function EmptyNote({ text }: { text: string }) {
-  return <p className="text-[0.9rem] text-[var(--color-ink-2)]">{text}</p>;
+  return (
+    <div className="rounded-xl border border-[var(--color-line)] bg-[var(--color-panel)]/40 p-4">
+      <p className="text-[0.9rem] leading-relaxed text-[var(--color-ink-2)]">{text}</p>
+    </div>
+  );
+}
+
+// Honest, on-brand panel shown in Contract Implications for suppliers with no
+// contract on file (every supplier outside SUP-001–004). Calm, not an error.
+function NoContractPanel() {
+  return (
+    <div className="flex items-start gap-3 rounded-xl border border-[var(--color-line)] bg-[var(--color-panel)]/50 p-5">
+      <Doc size={18} className="mt-0.5 shrink-0 text-[var(--color-ink-3)]" />
+      <div>
+        <p className="font-mono text-[0.62rem] font-medium uppercase tracking-[0.16em] text-[var(--color-ink-3)]">
+          Known gap
+        </p>
+        <p className="mt-1.5 text-[0.92rem] leading-relaxed text-[var(--color-ink-2)]">
+          No contract on file for this supplier. GCI&apos;s contract corpus covers its four highest-risk
+          strategic suppliers (SUP-001 to SUP-004). For suppliers outside that set, the tool reports this
+          as a known gap rather than inventing contract terms — the same discipline applied to every other
+          claim in this brief.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 // Strip any leading markdown bullet markers so confidence gaps render as clean
