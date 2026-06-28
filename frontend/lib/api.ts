@@ -32,11 +32,12 @@ export type RiskBriefResponse = {
   };
   violations: string[];
   meta: {
-    turns: number;
-    forced: boolean;
-    dropped_findings: number;
     cached: boolean;
-    generated_at: string;
+    no_cache?: boolean;
+    generated_at: string | null;
+    turns?: number;
+    forced?: boolean;
+    dropped_findings?: number;
   };
 };
 

@@ -109,19 +109,38 @@ def risk_brief(supplier_id: str, fresh: bool = False,
     os.makedirs(CACHE_DIR, exist_ok=True)
     path = os.path.join(CACHE_DIR, f"{supplier_id}.json")
     if not fresh and os.path.exists(path):
+        # serve cached brief as before
         with open(path) as f:
             resp = json.load(f)
         resp["meta"]["cached"] = True
         return resp
-    _check_secret(x_api_secret)  # only checked when fresh=True (cached path returns above)
-    try:
-        state = run_assessment(supplier_id)
-    except KeyError:
-        raise HTTPException(status_code=404, detail=f"unknown supplier {supplier_id}")
-    resp = state_to_response(state, cached=False)
-    with open(path, "w") as f:
-        json.dump(resp, f, indent=2)
-    return resp
+    elif not fresh and not os.path.exists(path):
+        # No cache exists and this is not a fresh request. Return a clean 200 with
+        # brief=null and a meta note so the frontend can show the graceful "no brief
+        # yet" state, instead of silently triggering a live run that burns API
+        # credits and fails validation for suppliers without a contract.
+        return {
+            "supplier_id": supplier_id,
+            "supplier_name": None,
+            "profile": None,
+            "brief": None,
+            "violations": [],
+            "meta": {
+                "cached": False,
+                "no_cache": True,
+                "generated_at": None,
+            },
+        }
+    else:  # fresh=True — run the live pipeline
+        _check_secret(x_api_secret)
+        try:
+            state = run_assessment(supplier_id)
+        except KeyError:
+            raise HTTPException(status_code=404, detail=f"unknown supplier {supplier_id}")
+        resp = state_to_response(state, cached=False)
+        with open(path, "w") as f:
+            json.dump(resp, f, indent=2)
+        return resp
 
 
 @app.get("/api/contract/{supplier_id}")

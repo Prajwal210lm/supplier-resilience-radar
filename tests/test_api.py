@@ -69,14 +69,26 @@ def test_cache_flow(tmp_path, monkeypatch):
 
     monkeypatch.setattr(api, "run_assessment", fake_run_assessment)
 
-    # First call: live run, not cached.
-    r1 = client.post("/api/risk-brief/SUP-001")
+    # No cache yet and not a fresh request: clean 200 with brief=null and a
+    # no_cache meta note, WITHOUT triggering a live run or writing a cache file.
+    r0 = client.post("/api/risk-brief/SUP-001")
+    assert r0.status_code == 200
+    body0 = r0.json()
+    assert body0["brief"] is None
+    assert body0["profile"] is None
+    assert body0["meta"]["cached"] is False
+    assert body0["meta"]["no_cache"] is True
+    assert counter["n"] == 0
+    assert os.listdir(str(tmp_path)) == []
+
+    # First fresh call: live run, not cached, writes the cache file.
+    r1 = client.post("/api/risk-brief/SUP-001?fresh=true")
     assert r1.status_code == 200
     assert r1.json()["meta"]["cached"] is False
     assert counter["n"] == 1
     assert any("SUP-001" in f for f in os.listdir(str(tmp_path)))
 
-    # Second call: served from cache, run_assessment not invoked again.
+    # Second call without fresh: served from cache, run_assessment not invoked again.
     r2 = client.post("/api/risk-brief/SUP-001")
     assert r2.status_code == 200
     assert r2.json()["meta"]["cached"] is True

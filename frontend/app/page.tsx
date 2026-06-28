@@ -133,6 +133,8 @@ export default function Home() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [loadingFresh, setLoadingFresh] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  // Calm, non-error message (e.g. a supplier we simply haven't assessed yet).
+  const [info, setInfo] = useState<string | null>(null);
   // Suppliers that have already used their single live run in THIS browser.
   const [freshUsed, setFreshUsed] = useState<Set<string>>(new Set());
 
@@ -159,6 +161,7 @@ export default function Home() {
   function onRun() {
     if (!selected) return;
     setNotice(null);
+    setInfo(null);
     if (fresh && canFresh) {
       setShowConfirm(true); // gate live runs behind the modal
       return;
@@ -176,22 +179,30 @@ export default function Home() {
     }
     setError(null);
     setNotice(null);
+    setInfo(null);
     setResult(null);
     setLoadingFresh(useFresh);
     setLoading(true);
     try {
       const data = await runRiskBrief(selected, useFresh);
+      // No cached brief exists and no live run was requested. This is not an error:
+      // we simply have not assessed this supplier yet. Show a calm prompt instead.
+      if (data.meta?.no_cache === true) {
+        setInfo(
+          "No saved brief for this supplier yet. Tick 'Force fresh research' to run a live assessment. It takes 2 to 3 minutes."
+        );
+      }
       // A live (fresh) run can return HTTP 200 with brief === null and a non-empty
       // violations array: the validator correctly withholding an unverifiable
       // claim, not a usable result. Treat that like a withheld live run and fall
       // back to the most recent validated (cached) brief, framed calmly.
-      if (useFresh && data.brief === null) {
+      else if (useFresh && data.brief === null) {
         try {
           const cached = await runRiskBrief(selected, false);
           if (cached.brief) {
             setResult(cached);
             setNotice(
-              "The live run produced a claim that couldn't be source-verified, so the brief was withheld. Showing the most recent validated brief."
+              "Live research ran but the result did not pass verification, so it was withheld. You are seeing the last saved brief for this supplier."
             );
           } else {
             setError(
@@ -212,13 +223,13 @@ export default function Home() {
         try {
           const cached = await runRiskBrief(selected, false);
           setResult(cached);
-          setNotice("Live research did not finish. Showing the most recent cached brief.");
+          setNotice("Live research did not finish. Showing the most recent saved brief.");
         } catch {
           setError("The live assessment could not be completed. Please try again later.");
         }
       } else {
         setError(
-          "No cached brief available for this supplier yet. Tick 'Force fresh research' to run a live assessment."
+          "No saved brief available for this supplier yet. Tick 'Force fresh research' to run a live assessment."
         );
       }
     } finally {
@@ -320,8 +331,8 @@ export default function Home() {
               <p>
                 <span className="font-semibold text-[var(--color-ink)]">What it produces:</span> for any
                 supplier, a risk score out of 100 and a short, board-ready brief. It covers where the
-                supplier sits in the supply chain, the live risks around it, what its contract lets the
-                supplier get away with, and a ranked list of actions to take.
+                supplier sits in the supply chain, the live risks around it, what its contract does and
+                does not hold the supplier to, and a ranked list of actions to take.
               </p>
               <p>
                 <span className="font-semibold text-[var(--color-ink)]">The one strict rule:</span> the
@@ -510,8 +521,8 @@ export default function Home() {
                 </label>
                 <p className="relative mt-1.5 text-[0.75rem] leading-snug text-[var(--color-ink-3)]">
                   {canFresh
-                    ? "Bypass the cache and run live web research (2–3 min)."
-                    : "One live run per supplier, already used. Showing the cached brief."}
+                    ? "Skip the saved result and research this supplier live now (takes 2 to 3 minutes)."
+                    : "You get one live run per supplier, and this one is used. Showing the saved result."}
                 </p>
 
                 {loadError && <p className="relative mt-4 font-mono text-[0.8rem] text-[var(--color-crit)]">{loadError}</p>}
@@ -547,6 +558,19 @@ export default function Home() {
               </div>
             </div>
           )}
+
+          {/* no-cache info — calm prompt, not an error */}
+          {info && !loading && !error && (
+            <div className="mt-10 flex items-start gap-3 rounded-2xl border border-[var(--color-accent)]/30 bg-[var(--color-accent-soft)] p-5">
+              <Shield size={18} className="mt-0.5 shrink-0 text-[var(--color-accent)]" />
+              <div>
+                <p className="font-display text-[0.95rem] font-medium text-[var(--color-ink)]">
+                  No brief yet
+                </p>
+                <p className="mt-1 text-[0.85rem] text-[var(--color-ink-2)]">{info}</p>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* ── 8. BRIEF ── */}
@@ -578,8 +602,8 @@ export default function Home() {
         confirmLabel="Run live research"
       >
         This runs live web research and can take{" "}
-        <span className="font-semibold text-[var(--color-ink)]">2–3 minutes</span>. You get one live run per
-        supplier, so the result replaces the cached brief. Continue?
+        <span className="font-semibold text-[var(--color-ink)]">2 to 3 minutes</span>. You get one live run per
+        supplier, so the result replaces the saved brief. Continue?
       </ConfirmDialog>
     </div>
   );
@@ -783,6 +807,28 @@ function Brief({
         </div>
       </div>
 
+      {/* meta strip — first thing the reader sees, so they know how fresh the data is */}
+      <div className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-[var(--color-line)] pt-5 font-mono text-[0.72rem] text-[var(--color-ink-3)]">
+        <span className="inline-flex items-center gap-1.5" style={{ color: result.meta.cached ? "var(--color-ink-3)" : "var(--color-accent-bright)" }}>
+          <span className="h-1.5 w-1.5 rounded-full" style={{ background: result.meta.cached ? "var(--color-ink-3)" : "var(--color-accent)" }} />
+          {result.meta.cached ? "SAVED" : "FRESH"}
+        </span>
+        <span className="text-[var(--color-line-strong)]">·</span>
+        <span>{result.meta.turns} research turns</span>
+        {result.meta.generated_at && (
+          <>
+            <span className="text-[var(--color-line-strong)]">·</span>
+            <span>generated {formatDate(result.meta.generated_at)}</span>
+          </>
+        )}
+        {result.meta.forced && (
+          <>
+            <span className="text-[var(--color-line-strong)]">·</span>
+            <span className="text-[var(--color-amber)]">forced submission</span>
+          </>
+        )}
+      </div>
+
       {/* validation failure */}
       {!brief && (
         <div className="mt-8 rounded-2xl border border-[var(--color-crit)]/30 bg-[var(--color-crit)]/[0.06] p-6">
@@ -970,23 +1016,6 @@ function Brief({
         </div>
       )}
 
-      {/* meta footer */}
-      <div className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-[var(--color-line)] pt-5 font-mono text-[0.72rem] text-[var(--color-ink-3)]">
-        <span className="inline-flex items-center gap-1.5" style={{ color: result.meta.cached ? "var(--color-ink-3)" : "var(--color-accent-bright)" }}>
-          <span className="h-1.5 w-1.5 rounded-full" style={{ background: result.meta.cached ? "var(--color-ink-3)" : "var(--color-accent)" }} />
-          {result.meta.cached ? "CACHED" : "FRESH"}
-        </span>
-        <span className="text-[var(--color-line-strong)]">·</span>
-        <span>{result.meta.turns} research turns</span>
-        <span className="text-[var(--color-line-strong)]">·</span>
-        <span>generated {formatDate(result.meta.generated_at)}</span>
-        {result.meta.forced && (
-          <>
-            <span className="text-[var(--color-line-strong)]">·</span>
-            <span className="text-[var(--color-amber)]">forced submission</span>
-          </>
-        )}
-      </div>
     </motion.section>
   );
 }

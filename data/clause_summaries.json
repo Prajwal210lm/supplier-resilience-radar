@@ -4,46 +4,46 @@
   },
   "SUP-001": {
     "1": "Three-year term from January 2023, auto-renewing in 12-month periods unless either side gives 180 days' written notice.",
-    "2": "Force majeure is written narrowly — it excludes the disruptions most likely to hit this supplier (plant breakdown, energy/material shortages, strikes, shipping delays), so they stay liable but we have little practical remedy; claims need notice within 5 business days.",
-    "3": "Standard replenishment lead time is 16 weeks — already longer than our 10-week stock gap.",
+    "2": "Force majeure is written narrowly. It excludes the disruptions most likely to hit this supplier (plant breakdown, energy or material shortages, strikes, shipping delays), so they stay liable but we have little practical remedy. Claims need notice within 5 business days.",
+    "3": "Standard replenishment lead time is 16 weeks, already longer than our 10-week stock gap.",
     "4": "We commit to buying at least 80% of the prior year's volume each year (minimum annual offtake).",
     "5": "An exclusivity clause bars us from qualifying any alternative source without the supplier's written consent.",
-    "6": "Prices are fixed annually; the supplier may pass through documented raw-material index moves above 8% on 60 days' notice.",
-    "7": "Liability is capped at the purchase-order value with no late-delivery penalty — we absorb the full cost of any line-down.",
-    "8": "Termination only for material breach uncured after 60 days; we have no right to terminate for convenience during the term.",
-    "9": "Notices in writing; governed by German law with arbitration seated in Frankfurt."
+    "6": "Prices are fixed annually. The supplier may pass through documented raw-material index moves above 8% on 60 days' notice.",
+    "7": "Liability is capped at the purchase-order value with no late-delivery penalty, so we absorb the full cost of any line-down.",
+    "8": "Termination only for material breach uncured after 60 days. We have no right to terminate for convenience during the term.",
+    "9": "Notices in writing. Governed by German law with arbitration seated in Frankfurt."
   },
   "SUP-002": {
     "1": "Two-year term from March 2023, auto-renewing in 12-month periods unless either side gives 90 days' notice.",
-    "2": "Broad 'beyond reasonable control' force majeure (including export-control or licensing action), with notice required within 10 days — wider protection for the supplier than the German contract.",
+    "2": "Broad 'beyond reasonable control' force majeure (including export-control or licensing action), with notice required within 10 days. That is wider protection for the supplier than the German contract.",
     "3": "Standard replenishment lead time is 10 weeks from a confirmed order.",
-    "4": "No minimum annual offtake commitment — we are free to vary volumes.",
-    "5": "Explicitly non-exclusive — we keep the right to qualify and buy equivalent scroll compressors from other suppliers at our discretion.",
+    "4": "No minimum annual offtake commitment, so we are free to vary volumes.",
+    "5": "Explicitly non-exclusive. We keep the right to qualify and buy equivalent scroll compressors from other suppliers at our discretion.",
     "6": "Prices are fixed for each 12-month period and reviewed at renewal.",
-    "7": "Liability capped at the purchase-order value, but with a 0.3%-per-week late-delivery penalty up to an 8% cap — unlike SUP-001, late delivery carries damages.",
-    "8": "We can terminate for convenience on 90 days' notice; either side can terminate for material breach uncured after 60 days.",
-    "9": "Notices in writing; governed by Singapore law with arbitration in Singapore (a neutral seat)."
+    "7": "Liability capped at the purchase-order value, but with a 0.3%-per-week late-delivery penalty up to an 8% cap. Unlike SUP-001, late delivery carries damages.",
+    "8": "We can terminate for convenience on 90 days' notice. Either side can terminate for material breach uncured after 60 days.",
+    "9": "Notices in writing. Governed by Singapore law with arbitration in Singapore (a neutral seat)."
   },
   "SUP-003": {
     "1": "Three-year term from July 2022, auto-renewing in 12-month periods unless either side gives 90 days' notice.",
-    "2": "Broad force majeure that expressly includes supplier plant failure, energy interruption, supply-chain disruption and transport delays, with 15 days' notice and a duty to mitigate — far wider cover for the supplier than SUP-001.",
+    "2": "Broad force majeure that expressly includes supplier plant failure, energy interruption, supply-chain disruption and transport delays, with 15 days' notice and a duty to mitigate. That is far wider cover for the supplier than SUP-001.",
     "3": "Standard replenishment lead time is 12 weeks from a confirmed order.",
     "4": "We commit to a minimum annual offtake of 75% of the prior year's volume.",
     "5": "We may second-source non-proprietary parts, but the proprietary controller firmware and the premium models using it stay sole-source to this supplier.",
-    "6": "The supplier must maintain and annually review a documented Business Continuity Plan; not having a current plan is a material breach — a contractual resilience lever in our favour.",
-    "7": "Liability capped at 2x the purchase-order value, with a 0.5%-per-week late-delivery penalty up to a 10% cap — the strongest remedies of the four contracts.",
+    "6": "The supplier must maintain and annually review a documented Business Continuity Plan. Not having a current plan is a material breach, a contractual resilience lever in our favour.",
+    "7": "Liability capped at 2x the purchase-order value, with a 0.5%-per-week late-delivery penalty up to a 10% cap, the strongest remedies of the four contracts.",
     "8": "Either party may terminate for material breach uncured after 45 days.",
-    "9": "Notices in writing; governed by Italian law with arbitration seated in Milan."
+    "9": "Notices in writing. Governed by Italian law with arbitration seated in Milan."
   },
   "SUP-004": {
     "1": "Three-year term from September 2022, auto-renewing in 12-month periods unless either side gives 90 days' notice.",
-    "2": "Force majeure covers acts of God, war, government action and transport/logistics disruption, with 10 days' notice and a duty to mitigate.",
+    "2": "Force majeure covers acts of God, war, government action and transport or logistics disruption, with 10 days' notice and a duty to mitigate.",
     "3": "Standard replenishment lead time is 9 weeks from a confirmed order.",
     "4": "We commit to a minimum annual offtake of 70% of the prior year's volume.",
-    "5": "We may qualify and buy equivalent heat exchangers from an alternative supplier on 30 days' notice — second-sourcing is contractually permitted.",
+    "5": "We may qualify and buy equivalent heat exchangers from an alternative supplier on 30 days' notice, so second-sourcing is contractually permitted.",
     "6": "Prices are fixed annually and reviewed at renewal.",
     "7": "Liability capped at the purchase-order value, with a 0.4%-per-week late-delivery penalty up to an 8% cap.",
     "8": "Either party may terminate for material breach uncured after 60 days.",
-    "9": "Notices in writing; governed by German law with arbitration seated in Frankfurt."
+    "9": "Notices in writing. Governed by German law with arbitration seated in Frankfurt."
   }
 }

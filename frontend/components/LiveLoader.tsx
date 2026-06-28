@@ -70,7 +70,7 @@ export default function LiveLoader({ fresh }: { fresh: boolean }) {
             </motion.p>
           </div>
           <p className="mt-3 max-w-[28rem] text-[0.85rem] leading-relaxed text-[var(--color-ink-3)]">
-            Live web research and contract analysis typically take 2–3 minutes. The agent
+            Live web research and contract analysis typically take 2 to 3 minutes. The agent
             works through company, country, logistics and contract risk before it writes.
           </p>
         </>
