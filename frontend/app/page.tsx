@@ -21,7 +21,7 @@ import {
   severity,
   splitLead,
 } from "@/lib/format";
-import { addFreshUsed, readFreshUsed } from "@/lib/fresh-guard";
+import { hasUsedFresh, markFreshUsed } from "@/lib/fresh-guard";
 import { CountUp, Reveal } from "@/components/motion";
 import Gauge from "@/components/Gauge";
 import Architecture from "@/components/Architecture";
@@ -135,8 +135,8 @@ export default function Home() {
   const [notice, setNotice] = useState<string | null>(null);
   // Calm, non-error message (e.g. a supplier we simply haven't assessed yet).
   const [info, setInfo] = useState<string | null>(null);
-  // Suppliers that have already used their single live run in THIS browser.
-  const [freshUsed, setFreshUsed] = useState<Set<string>>(new Set());
+  // Whether THIS browser has spent its single global live run (loaded after mount).
+  const [freshUsed, setFreshUsed] = useState(false);
 
   useEffect(() => {
     getSuppliers()
@@ -148,15 +148,15 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // Load the per-browser fresh-run guard after mount (kept out of the initial
-    // render so the server/first-client render match and don't trigger hydration
+    // Load the global fresh-run guard after mount (kept out of the initial render
+    // so the server/first-client render match and don't trigger hydration
     // warnings). Reading localStorage to sync external state is a valid effect use.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFreshUsed(readFreshUsed());
+    setFreshUsed(hasUsedFresh());
   }, []);
 
-  // A fresh run is only allowed if this supplier hasn't used its one live run yet.
-  const canFresh = selected !== "" && !freshUsed.has(selected);
+  // A fresh run is allowed only if this browser hasn't spent its one global run yet.
+  const canFresh = !freshUsed;
 
   function onRun() {
     if (!selected) return;
@@ -172,10 +172,11 @@ export default function Home() {
   async function assess(useFresh: boolean) {
     setShowConfirm(false);
     if (useFresh) {
-      // Count the run the moment it is confirmed, before the request fires. A
-      // failed or validation-withheld run still consumes this supplier's single
+      // Spend the global run the moment it is confirmed, before the request fires.
+      // A failed or validation-withheld run still consumes the visitor's single
       // live attempt, which is what stops credit burn on repeated failures.
-      setFreshUsed(addFreshUsed(selected));
+      markFreshUsed();
+      setFreshUsed(true);
     }
     setError(null);
     setNotice(null);
@@ -521,8 +522,8 @@ export default function Home() {
                 </label>
                 <p className="relative mt-1.5 text-[0.75rem] leading-snug text-[var(--color-ink-3)]">
                   {canFresh
-                    ? "Skip the saved result and research this supplier live now (takes 2 to 3 minutes)."
-                    : "You get one live run per supplier, and this one is used. Showing the saved result."}
+                    ? "Skip the saved result and research this supplier live now (takes 2 to 3 minutes). Allowed once — because API credits aren't free :)"
+                    : "One live run per visitor — already used. API credits aren't free :) Showing the saved brief."}
                 </p>
 
                 {loadError && <p className="relative mt-4 font-mono text-[0.8rem] text-[var(--color-crit)]">{loadError}</p>}
@@ -601,9 +602,9 @@ export default function Home() {
         title="Run live research?"
         confirmLabel="Run live research"
       >
-        This runs live web research and can take{" "}
-        <span className="font-semibold text-[var(--color-ink)]">2 to 3 minutes</span>. You get one live run per
-        supplier, so the result replaces the saved brief. Continue?
+        This runs live web research on this supplier and takes 2 to 3 minutes. You get{" "}
+        <span className="font-semibold text-[var(--color-ink)]">one live run across all suppliers</span> — so make
+        it count. API credits aren&apos;t free, but we thought one real run was worth it. Continue?
       </ConfirmDialog>
     </div>
   );

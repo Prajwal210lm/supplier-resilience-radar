@@ -1,34 +1,28 @@
 // Client-side guard for live ("Force fresh research") runs. Each fresh run costs
-// API credits and can fail validation, so we allow ONE fresh run per supplier per
-// browser, tracked in localStorage. This stops normal repeat use; it does NOT stop
-// a determined user who clears their storage. That tradeoff is fine for a demo —
-// the backend API secret covers casual direct abuse of the fresh endpoint.
+// API credits and can fail validation, so a visitor gets ONE live run across ALL
+// suppliers combined, tracked by a single flag in localStorage. This stops normal
+// repeat use; it does NOT stop a determined user who clears their storage. That
+// tradeoff is fine for a demo: the backend API secret covers casual direct abuse
+// of the fresh endpoint.
 
-const KEY = "srr_fresh_used";
+const KEY = "srr_fresh_used_global";
 
-export function readFreshUsed(): Set<string> {
-  if (typeof window === "undefined") return new Set();
+// True once this browser has spent its single global live run.
+export function hasUsedFresh(): boolean {
+  if (typeof window === "undefined") return false;
   try {
-    const raw = window.localStorage.getItem(KEY);
-    const parsed = raw ? (JSON.parse(raw) as unknown) : [];
-    if (!Array.isArray(parsed)) return new Set();
-    return new Set(parsed.filter((x): x is string => typeof x === "string"));
+    return window.localStorage.getItem(KEY) === "1";
   } catch {
-    return new Set();
+    return false;
   }
 }
 
-// Record that `id` has now used its single fresh run, and return the updated set.
-// Reads the latest value from storage first so concurrent updates don't clobber.
-export function addFreshUsed(id: string): Set<string> {
-  const set = readFreshUsed();
-  set.add(id);
-  if (typeof window !== "undefined") {
-    try {
-      window.localStorage.setItem(KEY, JSON.stringify([...set]));
-    } catch {
-      /* storage disabled or full — the guard is best-effort */
-    }
+// Record that the single global live run has now been spent.
+export function markFreshUsed(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(KEY, "1");
+  } catch {
+    /* storage disabled or full — the guard is best-effort */
   }
-  return set;
 }
