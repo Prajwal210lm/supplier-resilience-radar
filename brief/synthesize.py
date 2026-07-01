@@ -24,13 +24,18 @@ SYNTHESIS_SYSTEM_PROMPT = (
     "one supplier and a set of approved numeric facts. Write a five-section brief.\n\n"
     "Sections: concentration_profile (our exposure, using the numeric placeholders); "
     "risk_signals (external risks from research, each citing its web URL); "
-    "contract_implications (what our contract says, each citing a clause reference); "
+    "contract_implications (what our contract says, each citing a clause reference, "
+    "and ONLY when contract clauses were actually retrieved); "
     "recommended_actions (what to do, each citing the finding it rests on); "
     "confidence (what research could not establish).\n\n"
     "Hard rules:\n"
     "- Write NO digit anywhere in any text. Every number appears ONLY as a placeholder "
     "token like {{spend_share}}, drawn only from the approved key list. The values are "
     "shown for calibration; never write the value itself.\n"
+    "- NEVER write a supplier identifier (the 'SUP-0XX' token, e.g. SUP-006) anywhere "
+    "in the brief prose. Refer to the supplier by its name, or by role as 'this "
+    "supplier'. A 'SUP-0XX' token may appear ONLY inside a clause reference in the "
+    "citations field, never in any text. Mentioning the supplier by name is fine.\n"
     "- Refer to contract clauses by name in prose (e.g. 'the force majeure clause'), "
     "never by number. The formal reference goes in citations, not the text.\n"
     "- Put every source in the citations field, never in the prose.\n"
@@ -39,15 +44,45 @@ SYNTHESIS_SYSTEM_PROMPT = (
     "- risk_signals claims cite URLs; contract_implications claims cite clause references.\n"
     "- Every claim in risk_signals, contract_implications, recommended_actions carries "
     "at least one citation.\n"
+    "Contract Implications, conditional on retrieval:\n"
+    "- Write contract_implications ONLY from the contract clause references listed in "
+    "the message, and cite one of those exact references on each claim.\n"
+    "- If NO contract clauses were retrieved for this supplier, contract_implications "
+    "MUST be an empty list (zero items). Do NOT name, infer, paraphrase, or cite any "
+    "clause. Do NOT write the word 'Clause' or any clause reference. Do NOT invent "
+    "contract terms, penalties, or clause numbers. No contract retrieved means no "
+    "contract content. Instead, add one honest line to confidence stating that no "
+    "contract is on file for this supplier, so contract terms could not be assessed.\n"
     "- If research found no signal for something, put it in confidence. confidence "
     "must be non-empty."
 )
 
 
-def build_synthesis_message(findings, gaps, ctx) -> str:
-    lines = ["Research findings:"]
+def build_synthesis_message(supplier_name, findings, gaps, ctx) -> str:
+    lines = [
+        f"Supplier under assessment: {supplier_name}. Refer to it by this name or as "
+        "'this supplier'. Never write its SUP-0XX identifier in any text.",
+        "",
+        "Research findings:",
+    ]
     for f in findings:
         lines.append(f"- [{f.signal_type}] {f.claim}  (source: {f.source}; {f.relevance})")
+
+    # Make contract availability explicit so the model never invents a clause when
+    # none was retrieved. Contract findings carry their clause reference as the source.
+    contract_refs = [f.source for f in findings if f.signal_type == "contract"]
+    lines.append("\nContract clauses retrieved for this supplier:")
+    if contract_refs:
+        for src in contract_refs:
+            lines.append(f"- {src}")
+        lines.append("Write contract_implications ONLY from these clause references and "
+                     "cite the exact reference shown.")
+    else:
+        lines.append("- NONE. No contract is on file for this supplier.")
+        lines.append("contract_implications MUST be an empty list. Do not name, infer, "
+                     "or cite any clause, and do not write the word 'Clause'. Note in "
+                     "confidence that no contract is on file for this supplier.")
+
     lines.append("\nResearch could not establish:")
     for g in gaps:
         lines.append(f"- {g}")
@@ -69,7 +104,7 @@ def parse_brief(tool_input) -> "RiskBrief":
 
 
 def synthesize(profile, research_findings, client, ctx):
-    msg = build_synthesis_message(research_findings.findings,
+    msg = build_synthesis_message(profile.name, research_findings.findings,
                                   research_findings.searched_found_nothing, ctx)
     resp = client.messages.create(model=SYNTHESIS_MODEL, max_tokens=SYNTHESIS_MAX_TOKENS,
              system=SYNTHESIS_SYSTEM_PROMPT,

@@ -1,0 +1,128 @@
+{
+  "supplier_id": "SUP-013",
+  "supplier_name": "Gulf Insulation Co",
+  "profile": {
+    "spend_share": 0.02,
+    "spend_share_display": "2.0%",
+    "skus_single_sourced": 0,
+    "line_down_gap_weeks": 0,
+    "concentration_score": 18.5
+  },
+  "brief": {
+    "concentration_profile": [
+      {
+        "text": "Gulf Insulation Co represents 2.0% of total strategic procurement spend and accounts for 100.0% of spend within its insulation category, indicating full category concentration in a single vendor. Across the broader portfolio, the top five suppliers collectively absorb 55.0% of strategic spend, and 50.0% of total spend flows through single-source relationships \u2014 context that underscores the systemic concentration backdrop against which this supplier sits.",
+        "citations": []
+      },
+      {
+        "text": "25 finished chiller models depend on Gulf Insulation Co for insulation inputs. Of these, 0 have no qualified alternative source on record, meaning a supply interruption would not immediately strand any model in production. Current on-hand inventory provides 10 weeks of cover on critical items, and the replacement lead time is estimated at 3 weeks, yielding a line-down gap of 0 weeks if this supplier were to fail today.",
+        "citations": []
+      },
+      {
+        "text": "The composite concentration score for Gulf Insulation Co is 18.5 on a scale of zero to one hundred. While the absolute spend share is modest at 2.0% of the total strategic base of AED 480.0M AED, the category-level concentration is complete, making logistics and geopolitical disruptions disproportionately impactful relative to the headline spend weight.",
+        "citations": []
+      }
+    ],
+    "risk_signals": [
+      {
+        "text": "The most material near-term risk is a direct missile strike on Jebel Ali port that triggered a temporary suspension of DP World terminal operations on the first of March, two thousand and twenty-six. The world's largest container carriers \u2014 including MSC, Maersk, and Hapag-Lloyd \u2014 suspended bookings or crossings through the Strait of Hormuz, placing this supplier's primary export gateway at risk of sustained disruption.",
+        "citations": [
+          "https://www.bloomberg.com/news/articles/2026-03-01/dp-world-suspends-operations-at-jebel-ali-port-in-dubai"
+        ]
+      },
+      {
+        "text": "Inbound container flow at Jebel Ali collapsed sharply through March, with discharge volumes falling from thousands of TEU per day to near-zero levels within two weeks as vessels stopped arriving. UNCTAD warned that disruption at Jebel Ali ripples through liner shipping networks with cascading effects to other ports and countries, meaning Gulf Insulation Co's own raw material inputs may be constrained even if its manufacturing facilities remain operational.",
+        "citations": [
+          "https://www.vizionapi.com/blog/jebel-ali-port-throughput-falls-as-strait-of-hormuz-disruption-slows-vessel-flow"
+        ]
+      },
+      {
+        "text": "DP World has confirmed that Jebel Ali terminals resumed normal operations with enhanced security following the brief suspension, and has activated emergency overland corridors linking Jebel Ali with Dammam and other regional hubs as an alternative routing for impacted cargo. This provides partial mitigation and a viable contingency for overland delivery of insulation SKUs to GCC-based manufacturers.",
+        "citations": [
+          "https://www.maritimegateway.com/dp-world-activates-land-corridors-to-keep-jebel-ali-cargo-moving-amid-gulf-disruptions/"
+        ]
+      },
+      {
+        "text": "War-risk surcharges were immediately imposed by multiple ocean carriers following the March escalation, and fuel oil prices across top global ports rose sharply after the effective closure of the Strait of Hormuz. UNCTAD noted these adjustments could lead to delays, longer transit times, and increased logistics costs, meaning the landed cost of insulation from this supplier is likely to increase materially even once normal shipments resume.",
+        "citations": [
+          "https://www.arabianbusiness.com/business/transport/exclusive-hormuz-disruption-could-ripple-through-jebel-ali-shipping-networks-un-trade-agency"
+        ]
+      },
+      {
+        "text": "Active macroeconomic headwinds across the UAE manufacturing sector \u2014 including inflation, supply chain delays, rising commodity prices, and surging fuel rates \u2014 are compressing producer margins. This could affect pricing stability or capacity investment by Gulf Insulation Co in the near to medium term.",
+        "citations": [
+          "https://www.meed.com/the-road-ahead-for-uae-manufacturing"
+        ]
+      },
+      {
+        "text": "No company-specific adverse signals were identified for Gulf Insulation Co. The UAE insulation manufacturing market is active and competitive, with multiple ISO-certified regional players serving the same HVAC and industrial cooling applications. This indicates a healthy multi-vendor supplier base and supports substitutability if this supplier were to experience difficulties.",
+        "citations": [
+          "http://www.gulfcooltherm.com/"
+        ]
+      },
+      {
+        "text": "The broader UAE manufacturing environment remains stable and supportive: the sector is the third-largest contributor to nominal GDP, Operation bn targets significant industrial expansion by two thousand and thirty-one, and Abu Dhabi's manufacturing sector posted record value-added in two thousand and twenty-four, growing annually. The 'Make it in the Emirates' campaign continues to attract investment and expand the domestic supplier network, underpinning Gulf Insulation Co's operating environment.",
+        "citations": [
+          "https://www.thenationalnews.com/business/economy/2025/05/18/uae-manufacturing/",
+          "https://www.meed.com/the-road-ahead-for-uae-manufacturing"
+        ]
+      }
+    ],
+    "contract_implications": [],
+    "recommended_actions": [
+      {
+        "text": "Immediately engage Gulf Insulation Co to confirm whether existing inventory buffers and raw material stocks are sufficient to fulfil near-term orders given the collapse in inbound vessel flow at Jebel Ali. Obtain a formal written update on production continuity status and any constraints on outbound shipment capacity.",
+        "citations": [
+          "https://www.vizionapi.com/blog/jebel-ali-port-throughput-falls-as-strait-of-hormuz-disruption-slows-vessel-flow"
+        ]
+      },
+      {
+        "text": "Activate the DP World overland corridor via Dammam as the primary alternative routing for any insulation shipments scheduled in the coming weeks. Coordinate with Gulf Insulation Co and your freight forwarder to assess lead time and cost implications of this land bridge option relative to the standard sea route.",
+        "citations": [
+          "https://www.maritimegateway.com/dp-world-activates-land-corridors-to-keep-jebel-ali-cargo-moving-amid-gulf-disruptions/"
+        ]
+      },
+      {
+        "text": "Given that 10 weeks of on-hand cover exists on critical items and the replacement lead time is only 3 weeks, consider a tactical stock build-up to extend cover to a more resilient buffer level, protecting the 25 dependent chiller models through the period of logistics uncertainty.",
+        "citations": [
+          "https://www.bloomberg.com/news/articles/2026-03-01/dp-world-suspends-operations-at-jebel-ali-port-in-dubai",
+          "https://www.vizionapi.com/blog/jebel-ali-port-throughput-falls-as-strait-of-hormuz-disruption-slows-vessel-flow"
+        ]
+      },
+      {
+        "text": "Initiate qualification of at least one additional UAE-based insulation supplier from the identified competitive field of regional ISO-certified manufacturers. Since 100.0% of category spend is currently concentrated with Gulf Insulation Co, even partial dual-sourcing would materially reduce category concentration risk, and the existence of qualified regional alternatives supports a short qualification timeline.",
+        "citations": [
+          "http://www.gulfcooltherm.com/"
+        ]
+      },
+      {
+        "text": "Model the landed cost impact of war-risk surcharges and fuel price increases on insulation input costs, and incorporate a contingency buffer into near-term procurement budgets. Engage Gulf Insulation Co on price escalation mechanisms and explore whether fixed-price commitments can be secured for a defined forward period before surcharges are fully passed through.",
+        "citations": [
+          "https://www.arabianbusiness.com/business/transport/exclusive-hormuz-disruption-could-ripple-through-jebel-ali-shipping-networks-un-trade-agency",
+          "https://www.meed.com/the-road-ahead-for-uae-manufacturing"
+        ]
+      },
+      {
+        "text": "As no contract is currently on file for Gulf Insulation Co, prioritise formalising a written supply agreement that includes, at minimum, force majeure provisions, alternative sourcing rights, delivery performance standards, and price escalation caps. The current contractual void leaves the organisation without enforceable protections precisely during the period of elevated logistics risk.",
+        "citations": [
+          "https://www.bloomberg.com/news/articles/2026-03-01/dp-world-suspends-operations-at-jebel-ali-port-in-dubai"
+        ]
+      }
+    ],
+    "confidence": [
+      "No company-specific adverse signals \u2014 financial distress, insolvency risk, quality recalls, capacity constraints, or operational failures \u2014 were identified for Gulf Insulation Co. All company-level signals are absent from the research findings, so the internal health of this supplier cannot be independently verified.",
+      "No contract is on file for Gulf Insulation Co, so contract terms including force majeure provisions, war or conflict clauses, delivery penalty mechanisms, alternative sourcing rights, and termination rights could not be assessed. This is a material gap given the current logistics risk environment.",
+      "The precise volume and SKU mix of insulation materials sourced from Gulf Insulation Co is not disclosed in the research findings. The degree to which specific chiller models depend on unique insulation specifications versus commodity-grade inputs could not be determined, which affects substitutability assessment at the SKU level.",
+      "The current operational status of Gulf Insulation Co's manufacturing facility \u2014 including any direct impact from the Strait of Hormuz disruption on its own raw material supply chains \u2014 could not be confirmed from the research findings. Only the macro logistics environment was documented.",
+      "The extent to which war-risk surcharges and fuel cost increases have already been contractually passed through to the manufacturer, or are anticipated to be, could not be quantified from available sources."
+    ]
+  },
+  "violations": [],
+  "meta": {
+    "turns": 3,
+    "forced": false,
+    "dropped_findings": 1,
+    "cached": false,
+    "generated_at": "2026-06-30T20:20:12.885680+00:00"
+  }
+}

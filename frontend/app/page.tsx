@@ -522,8 +522,8 @@ export default function Home() {
                 </label>
                 <p className="relative mt-1.5 text-[0.75rem] leading-snug text-[var(--color-ink-3)]">
                   {canFresh
-                    ? "Skip the saved result and research this supplier live now (takes 2 to 3 minutes). Allowed once — because API credits aren't free :)"
-                    : "One live run per visitor — already used. API credits aren't free :) Showing the saved brief."}
+                    ? "Skip the saved result and research this supplier live now (takes 2 to 3 minutes). Allowed once, because API credits aren't free :)"
+                    : "One live run per visitor, already used. API credits aren't free :) Showing the saved brief."}
                 </p>
 
                 {loadError && <p className="relative mt-4 font-mono text-[0.8rem] text-[var(--color-crit)]">{loadError}</p>}
@@ -603,7 +603,7 @@ export default function Home() {
         confirmLabel="Run live research"
       >
         This runs live web research on this supplier and takes 2 to 3 minutes. You get{" "}
-        <span className="font-semibold text-[var(--color-ink)]">one live run across all suppliers</span> — so make
+        <span className="font-semibold text-[var(--color-ink)]">one live run across all suppliers</span>, so make
         it count. API credits aren&apos;t free, but we thought one real run was worth it. Continue?
       </ConfirmDialog>
     </div>
